@@ -14,7 +14,9 @@ export class PreAuthMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: () => void) {
     const token = req.headers.authorization;
+    console.log('PreAuthMiddleware 1', token);
     if (token != null && token != '') {
+      console.log('PreAuthMiddleware 2', token);
       this.auth
         .verifyIdToken(token.replace('Bearer ', ''))
         .then(async (decodedToken) => {
@@ -26,11 +28,12 @@ export class PreAuthMiddleware implements NestMiddleware {
           };
           next();
         })
-        .catch(() => {
+        .catch((err) => {
+          Logger.log('PreAuthMiddleware 3', err);
           PreAuthMiddleware.accessDenied(req.url, res);
         });
     } else {
-      Logger.log('PreAuthMiddleware 2');
+      Logger.log('PreAuthMiddleware 4');
       PreAuthMiddleware.accessDenied(req.url, res);
     }
   }

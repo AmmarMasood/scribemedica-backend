@@ -21,7 +21,9 @@ let PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
     }
     use(req, res, next) {
         const token = req.headers.authorization;
+        console.log('PreAuthMiddleware 1', token);
         if (token != null && token != '') {
+            console.log('PreAuthMiddleware 2', token);
             this.auth
                 .verifyIdToken(token.replace('Bearer ', ''))
                 .then(async (decodedToken) => {
@@ -33,12 +35,13 @@ let PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
                 };
                 next();
             })
-                .catch(() => {
+                .catch((err) => {
+                common_2.Logger.log('PreAuthMiddleware 3', err);
                 PreAuthMiddleware_1.accessDenied(req.url, res);
             });
         }
         else {
-            common_2.Logger.log('PreAuthMiddleware 2');
+            common_2.Logger.log('PreAuthMiddleware 4');
             PreAuthMiddleware_1.accessDenied(req.url, res);
         }
     }
