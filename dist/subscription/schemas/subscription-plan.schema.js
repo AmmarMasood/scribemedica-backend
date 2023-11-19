@@ -60,14 +60,12 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({
         type: String,
-        unique: true,
     }),
     __metadata("design:type", String)
 ], SubscriptionPlan.prototype, "stripeCustomerId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
         type: String,
-        unique: true,
     }),
     __metadata("design:type", String)
 ], SubscriptionPlan.prototype, "stripeSubscriptionId", void 0);

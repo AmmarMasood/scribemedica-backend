@@ -17,6 +17,7 @@ const firebase_app_1 = require("./auth/firebase-app");
 const preauth_middleware_1 = require("./auth/middleware/preauth.middleware");
 const notes_module_1 = require("./notes/notes.module");
 const subscription_module_1 = require("./subscription/subscription.module");
+const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(preauth_middleware_1.PreAuthMiddleware).forRoutes({
@@ -35,6 +36,7 @@ AppModule = __decorate([
             auth_module_1.AuthModule,
             notes_module_1.NotesModule,
             subscription_module_1.SubscriptionModule,
+            admin_module_1.AdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, firebase_app_1.FirebaseApp],

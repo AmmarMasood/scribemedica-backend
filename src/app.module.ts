@@ -13,6 +13,7 @@ import { FirebaseApp } from './auth/firebase-app';
 import { PreAuthMiddleware } from './auth/middleware/preauth.middleware';
 import { NotesModule } from './notes/notes.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     AuthModule,
     NotesModule,
     SubscriptionModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, FirebaseApp],

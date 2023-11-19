@@ -32,13 +32,11 @@ export class SubscriptionPlan {
 
   @Prop({
     type: String,
-    unique: true,
   })
   stripeCustomerId: string;
 
   @Prop({
     type: String,
-    unique: true,
   })
   stripeSubscriptionId: string;
 
