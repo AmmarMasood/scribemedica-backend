@@ -33,6 +33,9 @@ export class Profile {
   country: string;
 
   @Prop()
+  speciality: string;
+
+  @Prop()
   phoneNumber: string;
 
   @Prop({ type: 'ObjectId', ref: 'SubscriptionPlan', required: true })

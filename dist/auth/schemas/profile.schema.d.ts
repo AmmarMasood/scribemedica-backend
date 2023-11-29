@@ -30,6 +30,7 @@ export declare class Profile {
     role: string;
     profession: string;
     country: string;
+    speciality: string;
     phoneNumber: string;
     subscriptionId: ObjectId;
     notesAllowed: number;

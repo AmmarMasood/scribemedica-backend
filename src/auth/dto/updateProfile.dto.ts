@@ -14,6 +14,10 @@ export class ProfileUpdateDto {
   phoneNumber: string;
 
   @IsString()
+  @IsOptional()
+  speciality: string;
+
+  @IsString()
   @IsNotEmpty()
   fullName: string;
 }

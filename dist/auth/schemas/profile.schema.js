@@ -49,6 +49,10 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
+], Profile.prototype, "speciality", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
 ], Profile.prototype, "phoneNumber", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: 'ObjectId', ref: 'SubscriptionPlan', required: true }),

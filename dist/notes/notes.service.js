@@ -149,12 +149,19 @@ let NotesService = class NotesService {
     }
     async generateDetails(user, noteDetailGenerateDto) {
         try {
+            const profile = await this.profileModel.findOne({
+                userId: user.userId,
+            });
+            const text = `Create a medical note based on with this transcript for the person with these pronouns ${noteDetailGenerateDto.patientGender} here is the transcript ${noteDetailGenerateDto.transcript}`;
+            if (profile.speciality) {
+                text.concat(` and the speciality of the doctor who wrote this transcript is ${profile.speciality}, so make sure to create a note based on that speciality`);
+            }
             const c2 = await this.openai.chat.completions.create({
                 model: 'gpt-3.5-turbo',
                 messages: [
                     {
                         role: 'user',
-                        content: `Create a medical note based on with this transcript for the person with these pronouns ${noteDetailGenerateDto.patientGender} here is the transcript ${noteDetailGenerateDto.transcript}`,
+                        content: text,
                     },
                 ],
             });

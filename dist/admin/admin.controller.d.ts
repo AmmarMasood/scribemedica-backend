@@ -40,6 +40,7 @@ export declare class AdminController {
         role: string;
         profession: string;
         country: string;
+        speciality: string;
         phoneNumber: string;
         subscriptionId: import("bson").ObjectId;
         notesAllowed: number;
