@@ -34,6 +34,14 @@ export declare class AdminService {
             _id: import("mongoose").Types.ObjectId;
         };
     }>;
+    getUserDetails(userId: string, user: any): Promise<{
+        userDetail: import("mongoose").Document<unknown, {}, Profile> & Profile & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+        subscription: import("mongoose").Document<unknown, {}, SubscriptionPlan> & SubscriptionPlan & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+    }>;
     deleteNote(user: any, noteId: string): Promise<{
         note: import("mongoose").Document<unknown, {}, Note> & Note & {
             _id: import("mongoose").Types.ObjectId;
@@ -42,6 +50,7 @@ export declare class AdminService {
     getUsers(user: any, page: number, limit: number, search: string): Promise<{
         notesCount: any;
         fullName: string;
+        email: string;
         userId: string;
         role: string;
         profession: string;

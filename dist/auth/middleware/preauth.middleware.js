@@ -21,9 +21,7 @@ let PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
     }
     use(req, res, next) {
         const token = req.headers.authorization;
-        console.log('PreAuthMiddleware 1', token);
         if (token != null && token != '') {
-            console.log('PreAuthMiddleware 2', token);
             this.auth
                 .verifyIdToken(token.replace('Bearer ', ''))
                 .then(async (decodedToken) => {

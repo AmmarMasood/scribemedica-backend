@@ -121,6 +121,29 @@ export class AdminService {
     }
   }
 
+  async getUserDetails(userId: string, user: any) {
+    try {
+      this.isAdminUser(user);
+      const userDetail = await this.profileModel.findOne({
+        userId: userId,
+      });
+
+      if (!userDetail) throw new Error('Unable to find user');
+
+      const subscription = await this.subscriptionPlanModel.findById({
+        _id: userDetail.subscriptionId,
+      });
+
+      return {
+        userDetail,
+        subscription,
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error('Unable to get user details');
+    }
+  }
+
   async deleteNote(user: any, noteId: string) {
     try {
       this.isAdminUser(user);

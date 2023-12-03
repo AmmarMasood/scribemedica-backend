@@ -13,6 +13,9 @@ export class Profile {
   @Prop()
   fullName: string;
 
+  @Prop()
+  email: string;
+
   @Prop({
     unique: true,
     required: [true, 'userId is required'],

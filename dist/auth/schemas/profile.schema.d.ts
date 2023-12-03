@@ -26,6 +26,7 @@
 import { ObjectId } from 'mongodb';
 export declare class Profile {
     fullName: string;
+    email: string;
     userId: string;
     role: string;
     profession: string;

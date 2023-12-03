@@ -8,4 +8,8 @@ export class RegisterDto {
   @IsNotEmpty()
   @IsString()
   userId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  email: string;
 }

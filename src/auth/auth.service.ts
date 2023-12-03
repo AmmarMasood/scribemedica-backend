@@ -22,7 +22,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     try {
-      const { fullName, userId } = registerDto;
+      const { fullName, userId, email } = registerDto;
       const checkIfUserExist = await this.profileModel.exists({ userId });
       if (checkIfUserExist) {
         return checkIfUserExist;
@@ -33,6 +33,7 @@ export class AuthService {
         fullName,
         userId,
         subscriptionId: subscription._id,
+        email,
         notesAllowed: getNotesBasedOnPlan(subscription.planId),
       });
 

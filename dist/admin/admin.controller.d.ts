@@ -28,6 +28,14 @@ export declare class AdminController {
             _id: import("mongoose").Types.ObjectId;
         };
     }>;
+    getUserDetail(userId: string, req: Request): Promise<{
+        userDetail: import("mongoose").Document<unknown, {}, import("../auth/schemas/profile.schema").Profile> & import("../auth/schemas/profile.schema").Profile & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+        subscription: import("mongoose").Document<unknown, {}, import("../subscription/schemas/subscription-plan.schema").SubscriptionPlan> & import("../subscription/schemas/subscription-plan.schema").SubscriptionPlan & {
+            _id: import("mongoose").Types.ObjectId;
+        };
+    }>;
     deleteNotes(noteId: string, req: Request): Promise<{
         note: import("mongoose").Document<unknown, {}, import("../notes/schemas/note.schema").Note> & import("../notes/schemas/note.schema").Note & {
             _id: import("mongoose").Types.ObjectId;
@@ -36,6 +44,7 @@ export declare class AdminController {
     getUsers(req: Request, page: number, limit: number, search: string): Promise<{
         notesCount: any;
         fullName: string;
+        email: string;
         userId: string;
         role: string;
         profession: string;

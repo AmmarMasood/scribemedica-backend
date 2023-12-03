@@ -30,7 +30,7 @@ let AuthService = class AuthService {
     }
     async register(registerDto) {
         try {
-            const { fullName, userId } = registerDto;
+            const { fullName, userId, email } = registerDto;
             const checkIfUserExist = await this.profileModel.exists({ userId });
             if (checkIfUserExist) {
                 return checkIfUserExist;
@@ -40,6 +40,7 @@ let AuthService = class AuthService {
                 fullName,
                 userId,
                 subscriptionId: subscription._id,
+                email,
                 notesAllowed: (0, plans_1.getNotesBasedOnPlan)(subscription.planId),
             });
             return profile;

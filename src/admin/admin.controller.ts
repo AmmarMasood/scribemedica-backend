@@ -35,6 +35,11 @@ export class AdminController {
     return this.adminService.getNoteDetails(noteId, req.user);
   }
 
+  @Get('/user/:userId')
+  async getUserDetail(@Param('userId') userId: string, @Req() req: Request) {
+    return this.adminService.getUserDetails(userId, req.user);
+  }
+
   @Delete('/notes/:noteId')
   async deleteNotes(@Param('noteId') noteId: string, @Req() req: Request) {
     return this.adminService.deleteNote(req.user, noteId);

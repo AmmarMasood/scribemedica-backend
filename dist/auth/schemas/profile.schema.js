@@ -24,6 +24,10 @@ __decorate([
     __metadata("design:type", String)
 ], Profile.prototype, "fullName", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Profile.prototype, "email", void 0);
+__decorate([
     (0, mongoose_1.Prop)({
         unique: true,
         required: [true, 'userId is required'],

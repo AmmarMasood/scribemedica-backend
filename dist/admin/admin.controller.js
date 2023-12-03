@@ -25,6 +25,9 @@ let AdminController = class AdminController {
     async getNoteDetail(noteId, req) {
         return this.adminService.getNoteDetails(noteId, req.user);
     }
+    async getUserDetail(userId, req) {
+        return this.adminService.getUserDetails(userId, req.user);
+    }
     async deleteNotes(noteId, req) {
         return this.adminService.deleteNote(req.user, noteId);
     }
@@ -57,6 +60,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getNoteDetail", null);
+__decorate([
+    (0, common_1.Get)('/user/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getUserDetail", null);
 __decorate([
     (0, common_1.Delete)('/notes/:noteId'),
     __param(0, (0, common_1.Param)('noteId')),
