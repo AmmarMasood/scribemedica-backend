@@ -141,7 +141,30 @@ export class SubscriptionService {
         );
       }
 
-      console.log('============> ', event);
+      if (event.type === 'customer.subscription.deleted') {
+        // Handle subscription cancellation
+
+        const canceledSubscription = event.data.object as Stripe.Subscription;
+
+        await this.subscriptionPlanModel.findOneAndUpdate(
+          {
+            stripeSubscriptionId: canceledSubscription.id,
+          },
+          {
+            status: SubscriptionPlanStatus.CANCELLED,
+            // Add any other fields you need to update for cancellation
+          },
+        );
+
+        await this.profileModel.findOneAndUpdate(
+          {
+            userId: session.metadata.userId,
+          },
+          {
+            notesAllowed: getNotesBasedOnPlan(SubscriptionPlans.FREE),
+          },
+        );
+      }
 
       return {
         status: 'success',
