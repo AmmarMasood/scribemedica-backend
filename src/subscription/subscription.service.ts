@@ -97,12 +97,6 @@ export class SubscriptionService {
 
       console.log('============> WEBHOOK event', event);
 
-      return {
-        status: 'success',
-        code: 200,
-        message: 'Request succeeded',
-      };
-
       if (event.type === 'checkout.session.completed') {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string,
@@ -151,6 +145,26 @@ export class SubscriptionService {
         );
       }
 
+      if (event.type === 'subscription_schedule.canceled') {
+        // Handle subscription cancellation
+
+        const canceledSubscription = event.data.object as Stripe.Subscription;
+
+        await this.subscriptionPlanModel.findOneAndUpdate(
+          {
+            stripeSubscriptionId: canceledSubscription.id,
+          },
+          {
+            status: SubscriptionPlanStatus.CANCELLED,
+            planId: SubscriptionPlans.FREE,
+            freePlanExpirationDate: new Date(
+              Date.now() + 30 * 24 * 60 * 60 * 1000,
+            ),
+            // Add any other fields you need to update for cancellation
+          },
+        );
+      }
+
       if (event.type === 'customer.subscription.deleted') {
         // Handle subscription cancellation
 
@@ -162,6 +176,7 @@ export class SubscriptionService {
           },
           {
             status: SubscriptionPlanStatus.CANCELLED,
+            planId: SubscriptionPlans.FREE,
             // Add any other fields you need to update for cancellation
           },
         );
