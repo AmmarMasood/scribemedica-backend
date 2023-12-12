@@ -93,6 +93,10 @@ export class SubscriptionService {
         };
       }
 
+      console.log('============> WEBHOOK session', session);
+
+      console.log('============> WEBHOOK event', event);
+
       if (event.type === 'checkout.session.completed') {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string,
@@ -172,7 +176,7 @@ export class SubscriptionService {
         message: 'Request succeeded',
       };
     } catch (err) {
-      console.log('============> ', err);
+      console.log('============> WEBHOOK ERROR', err);
       throw new BadRequestException(
         `Webhook Error: ${
           err instanceof Error ? err.message : 'Unknown Error'
