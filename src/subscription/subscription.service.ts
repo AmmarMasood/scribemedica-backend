@@ -97,6 +97,12 @@ export class SubscriptionService {
 
       console.log('============> WEBHOOK event', event);
 
+      return {
+        status: 'success',
+        code: 200,
+        message: 'Request succeeded',
+      };
+
       if (event.type === 'checkout.session.completed') {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string,
