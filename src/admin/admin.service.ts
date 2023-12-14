@@ -321,6 +321,7 @@ export class AdminService {
         throw new ForbiddenException('User is not an admin');
       }
     } catch (e) {
+      console.log('error', e);
       throw new InternalServerErrorException('Somthing went wrong');
     }
   }

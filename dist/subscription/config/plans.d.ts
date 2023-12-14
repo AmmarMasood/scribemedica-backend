@@ -17,5 +17,5 @@ export declare enum SubscriptionPlanStatus {
     INACTIVE = "INACTIVE",
     CANCELLED = "CANCELLED"
 }
-export declare const getNotesBasedOnPlan: (plan: SubscriptionPlans) => 375 | 100 | 5 | 0;
+export declare const getNotesBasedOnPlan: (plan: SubscriptionPlans) => 0 | 375 | 100 | 5;
 export declare const isFreePlanActive: (subscriptionPlan: any) => boolean;
