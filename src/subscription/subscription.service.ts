@@ -91,6 +91,58 @@ export class SubscriptionService {
 
       console.log('============> WEBHOOK event', event);
 
+      if (event.type === 'customer.subscription.updated') {
+        // Handle subscription cancellation
+
+        const subscription = event.data.object as Stripe.Subscription;
+
+        if (subscription.canceled_at !== null) {
+          await this.subscriptionPlanModel.findOneAndUpdate(
+            {
+              stripeSubscriptionId: subscription.id,
+            },
+            {
+              status: SubscriptionPlanStatus.CANCELLED,
+              planId: SubscriptionPlans.FREE,
+              freePlanExpirationDate: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000,
+              ),
+              // Add any other fields you need to update for cancellation
+            },
+          );
+        } else {
+          const subscription = await stripe.subscriptions.retrieve(
+            session.subscription as string,
+          );
+          console.log('team here', subscription);
+
+          await this.subscriptionPlanModel.findOneAndUpdate(
+            {
+              stripeSubscriptionId: subscription.id,
+            },
+            {
+              status: SubscriptionPlanStatus.ACTIVE,
+              stripeCustomerId: session.customer as string,
+              stripeSubscriptionId: session.subscription as string,
+              stripePriceId: subscription.items.data[0].price.id,
+              stripeCurrentPeriodEnd: new Date(
+                subscription.current_period_end * 1000,
+              ),
+              planId: session.metadata.planId,
+            },
+          );
+
+          await this.profileModel.findOneAndUpdate(
+            {
+              userId: session.metadata.userId,
+            },
+            {
+              notesAllowed: getNotesBasedOnPlan(session.metadata.planId as any),
+            },
+          );
+        }
+      }
+
       if (!session?.metadata?.userId) {
         return {
           status: 200,
@@ -147,57 +199,6 @@ export class SubscriptionService {
             ),
           },
         );
-      }
-
-      if (event.type === 'customer.subscription.updated') {
-        // Handle subscription cancellation
-
-        const subscription = event.data.object as Stripe.Subscription;
-
-        if (subscription.canceled_at !== null) {
-          await this.subscriptionPlanModel.findOneAndUpdate(
-            {
-              stripeSubscriptionId: subscription.id,
-            },
-            {
-              status: SubscriptionPlanStatus.CANCELLED,
-              planId: SubscriptionPlans.FREE,
-              freePlanExpirationDate: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000,
-              ),
-              // Add any other fields you need to update for cancellation
-            },
-          );
-        } else {
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription as string,
-          );
-
-          await this.subscriptionPlanModel.findOneAndUpdate(
-            {
-              userId: session.metadata.userId,
-            },
-            {
-              status: SubscriptionPlanStatus.ACTIVE,
-              stripeCustomerId: session.customer as string,
-              stripeSubscriptionId: session.subscription as string,
-              stripePriceId: subscription.items.data[0].price.id,
-              stripeCurrentPeriodEnd: new Date(
-                subscription.current_period_end * 1000,
-              ),
-              planId: session.metadata.planId,
-            },
-          );
-
-          await this.profileModel.findOneAndUpdate(
-            {
-              userId: session.metadata.userId,
-            },
-            {
-              notesAllowed: getNotesBasedOnPlan(session.metadata.planId as any),
-            },
-          );
-        }
       }
 
       if (event.type === 'subscription_schedule.canceled') {

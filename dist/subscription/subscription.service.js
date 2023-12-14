@@ -76,13 +76,15 @@ let SubscriptionService = class SubscriptionService {
         try {
             event = stripe.webhooks.constructEvent(requestBody, signature, this.configService.get('STRIPE_WEBHOOK_SECRECT_PROD'));
             const session = event.data.object;
+            console.log('============> WEBHOOK session', session);
+            console.log('============> WEBHOOK event', event);
             if (!((_a = session === null || session === void 0 ? void 0 : session.metadata) === null || _a === void 0 ? void 0 : _a.userId)) {
                 return {
                     status: 200,
                 };
             }
-            console.log('============> WEBHOOK session', session);
-            console.log('============> WEBHOOK event', event);
+            console.log('============> WEBHOOK  1 session', session);
+            console.log('============> WEBHOOK 1 event', event);
             if (event.type === 'checkout.session.completed') {
                 const subscription = await stripe.subscriptions.retrieve(session.subscription);
                 await this.subscriptionPlanModel.findOneAndUpdate({

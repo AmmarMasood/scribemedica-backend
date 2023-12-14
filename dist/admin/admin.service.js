@@ -263,6 +263,7 @@ let AdminService = class AdminService {
             }
         }
         catch (e) {
+            console.log('error', e);
             throw new common_1.InternalServerErrorException('Somthing went wrong');
         }
     }
