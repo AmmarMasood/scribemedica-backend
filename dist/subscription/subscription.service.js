@@ -78,6 +78,37 @@ let SubscriptionService = class SubscriptionService {
             const session = event.data.object;
             console.log('============> WEBHOOK session', session);
             console.log('============> WEBHOOK event', event);
+            if (event.type === 'customer.subscription.updated') {
+                const subscription = event.data.object;
+                if (subscription.canceled_at !== null) {
+                    await this.subscriptionPlanModel.findOneAndUpdate({
+                        stripeSubscriptionId: subscription.id,
+                    }, {
+                        status: plans_1.SubscriptionPlanStatus.CANCELLED,
+                        planId: plans_1.SubscriptionPlans.FREE,
+                        freePlanExpirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    });
+                }
+                else {
+                    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+                    console.log('team here', subscription);
+                    await this.subscriptionPlanModel.findOneAndUpdate({
+                        stripeSubscriptionId: subscription.id,
+                    }, {
+                        status: plans_1.SubscriptionPlanStatus.ACTIVE,
+                        stripeCustomerId: session.customer,
+                        stripeSubscriptionId: session.subscription,
+                        stripePriceId: subscription.items.data[0].price.id,
+                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                        planId: session.metadata.planId,
+                    });
+                    await this.profileModel.findOneAndUpdate({
+                        userId: session.metadata.userId,
+                    }, {
+                        notesAllowed: (0, plans_1.getNotesBasedOnPlan)(session.metadata.planId),
+                    });
+                }
+            }
             if (!((_a = session === null || session === void 0 ? void 0 : session.metadata) === null || _a === void 0 ? void 0 : _a.userId)) {
                 return {
                     status: 200,
@@ -110,36 +141,6 @@ let SubscriptionService = class SubscriptionService {
                     stripePriceId: subscription.items.data[0].price.id,
                     stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
                 });
-            }
-            if (event.type === 'customer.subscription.updated') {
-                const subscription = event.data.object;
-                if (subscription.canceled_at !== null) {
-                    await this.subscriptionPlanModel.findOneAndUpdate({
-                        stripeSubscriptionId: subscription.id,
-                    }, {
-                        status: plans_1.SubscriptionPlanStatus.CANCELLED,
-                        planId: plans_1.SubscriptionPlans.FREE,
-                        freePlanExpirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    });
-                }
-                else {
-                    const subscription = await stripe.subscriptions.retrieve(session.subscription);
-                    await this.subscriptionPlanModel.findOneAndUpdate({
-                        userId: session.metadata.userId,
-                    }, {
-                        status: plans_1.SubscriptionPlanStatus.ACTIVE,
-                        stripeCustomerId: session.customer,
-                        stripeSubscriptionId: session.subscription,
-                        stripePriceId: subscription.items.data[0].price.id,
-                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                        planId: session.metadata.planId,
-                    });
-                    await this.profileModel.findOneAndUpdate({
-                        userId: session.metadata.userId,
-                    }, {
-                        notesAllowed: (0, plans_1.getNotesBasedOnPlan)(session.metadata.planId),
-                    });
-                }
             }
             if (event.type === 'subscription_schedule.canceled') {
                 const canceledSubscription = event.data.object;

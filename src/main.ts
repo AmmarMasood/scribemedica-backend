@@ -5,6 +5,8 @@ import rawBodyMiddleware from './middlewares/rawBody.middleware';
 require('dotenv').config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get('ConfigService');
+  const port = configService.get('PORT');
   app.enableCors();
   app.use(rawBodyMiddleware());
   app.useGlobalPipes(
@@ -12,6 +14,8 @@ async function bootstrap() {
       whitelist: true, // Remove unknown properties from DTOs
     }),
   );
-  await app.listen(3000);
+  await app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 }
 bootstrap();

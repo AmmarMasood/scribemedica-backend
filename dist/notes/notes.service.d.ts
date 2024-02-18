@@ -38,8 +38,8 @@ export declare class NotesService {
     private profileModel;
     private subscriptionPlanModel;
     private readonly configService;
-    private apiKey;
     private openai;
+    private azureOpenAi;
     constructor(noteModel: Model<Note>, noteDetailModel: Model<NoteDetail>, profileModel: Model<Profile>, subscriptionPlanModel: Model<SubscriptionPlan>, configService: ConfigService);
     createNew(createDto: CreateDto, user: any): Promise<import("mongoose").Document<unknown, {}, Note> & Note & {
         _id: import("mongoose").Types.ObjectId;
@@ -61,6 +61,14 @@ export declare class NotesService {
         };
     }>;
     generateDetails(user: any, noteDetailGenerateDto: NoteDetailGenerateDto): Promise<{
+        note: any;
+        model: any;
+    }>;
+    generateWithOpenAI(text: any, transcript: any, noteType: any): Promise<{
+        note: any;
+        model: any;
+    }>;
+    generateDetailWithAzure(text: any, transcript: any, noteType: any): Promise<{
         note: any;
         model: any;
     }>;

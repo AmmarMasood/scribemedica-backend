@@ -21,11 +21,12 @@ import {
   isFreePlanActive,
 } from 'src/subscription/config/plans';
 import { ConfigService } from '@nestjs/config';
+import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 @Injectable()
 export class NotesService {
-  private apiKey: string;
   private openai: any;
+  private azureOpenAi: any;
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @InjectModel(NoteDetail.name) private noteDetailModel: Model<NoteDetail>,
@@ -38,6 +39,15 @@ export class NotesService {
     this.openai = new OpenAI({
       apiKey: apiKey,
     });
+    const azureOpenAiApiKey =
+      this.configService.get<string>('AZURE_OPENAI_KEY');
+    const azureOpenAiEndpoint =
+      this.configService.get<string>('AZURE_ENDPOINT');
+
+    this.azureOpenAi = new OpenAIClient(
+      azureOpenAiEndpoint,
+      new AzureKeyCredential(azureOpenAiApiKey),
+    );
   }
 
   async createNew(createDto: CreateDto, user: any) {
@@ -202,6 +212,27 @@ export class NotesService {
         );
       }
 
+      // const t = await this.generateWithOpenAI(
+      //   text,
+      //   noteDetailGenerateDto.transcript,
+      //   noteDetailGenerateDto.noteType,
+      // );
+
+      const t = await this.generateDetailWithAzure(
+        text,
+        noteDetailGenerateDto.transcript,
+        noteDetailGenerateDto.noteType,
+      );
+
+      return t;
+    } catch (err) {
+      console.log(err);
+      throw new Error('Unable to generate note details');
+    }
+  }
+
+  async generateWithOpenAI(text: any, transcript: any, noteType: any) {
+    try {
       const c2 = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -218,10 +249,43 @@ export class NotesService {
         messages: [
           {
             role: 'user',
-            content: `This is the medical note: ${reply} created against patient with this transcript ${noteDetailGenerateDto.transcript} for the patient. Enhance it and return a ${noteDetailGenerateDto.noteType}.`,
+            content: `This is the medical note: ${reply} created against patient with this transcript ${transcript} for the patient. Enhance it and return a ${noteType}.`,
           },
         ],
       });
+
+      return {
+        note: c3.choices[0].message.content,
+        model: c3.model,
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error('Unable to generate note details');
+    }
+  }
+  async generateDetailWithAzure(text: any, transcript: any, noteType: any) {
+    try {
+      const c2 = await this.azureOpenAi.getChatCompletions(
+        'scribemedica-gpt-35',
+        [
+          {
+            role: 'user',
+            content: text,
+          },
+        ],
+        {},
+      );
+      const reply = c2.choices[0].message.content;
+      const c3 = await this.azureOpenAi.getChatCompletions(
+        'scribemedica-gpt-35',
+        [
+          {
+            role: 'user',
+            content: `This is the medical note: ${reply} created against patient with this transcript ${transcript} for the patient. Enhance it and return a ${noteType}.`,
+          },
+        ],
+        {},
+      );
 
       return {
         note: c3.choices[0].message.content,
