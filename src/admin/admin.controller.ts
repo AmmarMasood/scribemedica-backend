@@ -15,7 +15,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
   @Get('/notes')
   async getNotes(
-    @Req() req: Request,
+    @Req() req: any,
     @Query('noteType') noteType: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
@@ -31,23 +31,23 @@ export class AdminController {
   }
 
   @Get('/notes/:noteId')
-  async getNoteDetail(@Param('noteId') noteId: string, @Req() req: Request) {
+  async getNoteDetail(@Param('noteId') noteId: string, @Req() req: any) {
     return this.adminService.getNoteDetails(noteId, req.user);
   }
 
   @Get('/user/:userId')
-  async getUserDetail(@Param('userId') userId: string, @Req() req: Request) {
+  async getUserDetail(@Param('userId') userId: string, @Req() req: any) {
     return this.adminService.getUserDetails(userId, req.user);
   }
 
   @Delete('/notes/:noteId')
-  async deleteNotes(@Param('noteId') noteId: string, @Req() req: Request) {
+  async deleteNotes(@Param('noteId') noteId: string, @Req() req: any) {
     return this.adminService.deleteNote(req.user, noteId);
   }
 
   @Get('/users')
   async getUsers(
-    @Req() req: Request,
+    @Req() req: any,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('search') search: string,
@@ -56,12 +56,12 @@ export class AdminController {
   }
 
   @Delete('/user/:userId')
-  async deleteUser(@Param('userId') userId: string, @Req() req: Request) {
+  async deleteUser(@Param('userId') userId: string, @Req() req: any) {
     return this.adminService.deleteUser(req.user, userId);
   }
 
   @Get('/')
-  async checkIfIsAdmin(@Req() req: Request) {
+  async checkIfIsAdmin(@Req() req: any) {
     return this.adminService.isAdminUserCheck(req.user);
   }
 }
