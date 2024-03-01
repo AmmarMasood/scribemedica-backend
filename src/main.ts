@@ -14,8 +14,9 @@ async function bootstrap() {
       whitelist: true, // Remove unknown properties from DTOs
     }),
   );
-  await app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Server is running on port ${process.env.SERVER_PORT}`);
+  const port = process.env.SERVER_PORT || 3000;
+  await app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
   });
 }
 bootstrap();
