@@ -13,6 +13,7 @@ exports.ProfileUpdateDto = void 0;
 const class_validator_1 = require("class-validator");
 class ProfileUpdateDto {
 }
+exports.ProfileUpdateDto = ProfileUpdateDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -38,5 +39,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], ProfileUpdateDto.prototype, "fullName", void 0);
-exports.ProfileUpdateDto = ProfileUpdateDto;
 //# sourceMappingURL=updateProfile.dto.js.map

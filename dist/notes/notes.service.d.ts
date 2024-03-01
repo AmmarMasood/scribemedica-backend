@@ -31,16 +31,14 @@ import { NoteDetail } from './schemas/note-detail.schema';
 import { NoteDetailGenerateDto } from './dto/note-detail-generate.dto';
 import { Profile } from 'src/auth/schemas/profile.schema';
 import { SubscriptionPlan } from 'src/subscription/schemas/subscription-plan.schema';
-import { ConfigService } from '@nestjs/config';
 export declare class NotesService {
     private noteModel;
     private noteDetailModel;
     private profileModel;
     private subscriptionPlanModel;
-    private readonly configService;
     private openai;
     private azureOpenAi;
-    constructor(noteModel: Model<Note>, noteDetailModel: Model<NoteDetail>, profileModel: Model<Profile>, subscriptionPlanModel: Model<SubscriptionPlan>, configService: ConfigService);
+    constructor(noteModel: Model<Note>, noteDetailModel: Model<NoteDetail>, profileModel: Model<Profile>, subscriptionPlanModel: Model<SubscriptionPlan>);
     createNew(createDto: CreateDto, user: any): Promise<import("mongoose").Document<unknown, {}, Note> & Note & {
         _id: import("mongoose").Types.ObjectId;
     }>;

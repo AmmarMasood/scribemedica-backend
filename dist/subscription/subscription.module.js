@@ -14,9 +14,9 @@ const subscription_plan_schema_1 = require("./schemas/subscription-plan.schema")
 const mongoose_1 = require("@nestjs/mongoose");
 const profile_schema_1 = require("../auth/schemas/profile.schema");
 const stripe_1 = require("./config/stripe");
-let SubscriptionModule = class SubscriptionModule {
+let SubscriptionModule = exports.SubscriptionModule = class SubscriptionModule {
 };
-SubscriptionModule = __decorate([
+exports.SubscriptionModule = SubscriptionModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -34,5 +34,4 @@ SubscriptionModule = __decorate([
         providers: [subscription_service_1.SubscriptionService, stripe_1.StripeService],
     })
 ], SubscriptionModule);
-exports.SubscriptionModule = SubscriptionModule;
 //# sourceMappingURL=subscription.module.js.map

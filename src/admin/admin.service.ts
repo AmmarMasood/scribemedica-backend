@@ -8,12 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Profile } from 'src/auth/schemas/profile.schema';
 import { SubscriptionPlan } from 'src/subscription/schemas/subscription-plan.schema';
-import {
-  SubscriptionPlanStatus,
-  SubscriptionPlans,
-  isFreePlanActive,
-} from 'src/subscription/config/plans';
-import { ConfigService } from '@nestjs/config';
 import { NoteDetail } from 'src/notes/schemas/note-detail.schema';
 import { Note } from 'src/notes/schemas/note.schema';
 

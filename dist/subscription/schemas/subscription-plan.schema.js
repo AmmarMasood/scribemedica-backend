@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubscriptionPlanSchema = exports.SubscriptionPlan = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const plans_1 = require("../config/plans");
-let SubscriptionPlan = class SubscriptionPlan {
+let SubscriptionPlan = exports.SubscriptionPlan = class SubscriptionPlan {
     get daysLeftForFreePlan() {
         const currentDate = new Date();
         const expirationDate = this.freePlanExpirationDate;
@@ -81,11 +81,10 @@ __decorate([
     }),
     __metadata("design:type", Date)
 ], SubscriptionPlan.prototype, "stripeCurrentPeriodEnd", void 0);
-SubscriptionPlan = __decorate([
+exports.SubscriptionPlan = SubscriptionPlan = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
     })
 ], SubscriptionPlan);
-exports.SubscriptionPlan = SubscriptionPlan;
 exports.SubscriptionPlanSchema = mongoose_1.SchemaFactory.createForClass(SubscriptionPlan);
 //# sourceMappingURL=subscription-plan.schema.js.map

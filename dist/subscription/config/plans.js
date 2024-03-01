@@ -8,13 +8,13 @@ var SubscriptionPlans;
     SubscriptionPlans["TIER2_YEARLY"] = "tier2-yearly";
     SubscriptionPlans["TIER2_MONTHLY"] = "tier2-monthly";
     SubscriptionPlans["FREE"] = "free";
-})(SubscriptionPlans = exports.SubscriptionPlans || (exports.SubscriptionPlans = {}));
+})(SubscriptionPlans || (exports.SubscriptionPlans = SubscriptionPlans = {}));
 var SubscriptionPlanStatus;
 (function (SubscriptionPlanStatus) {
     SubscriptionPlanStatus["ACTIVE"] = "ACTIVE";
     SubscriptionPlanStatus["INACTIVE"] = "INACTIVE";
     SubscriptionPlanStatus["CANCELLED"] = "CANCELLED";
-})(SubscriptionPlanStatus = exports.SubscriptionPlanStatus || (exports.SubscriptionPlanStatus = {}));
+})(SubscriptionPlanStatus || (exports.SubscriptionPlanStatus = SubscriptionPlanStatus = {}));
 const getNotesBasedOnPlan = (plan) => {
     switch (plan) {
         case SubscriptionPlans.TIER1_YEARLY:

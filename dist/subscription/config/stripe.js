@@ -11,23 +11,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StripeService = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const stripe_1 = require("stripe");
-let StripeService = class StripeService {
-    constructor(configService) {
-        this.configService = configService;
+let StripeService = exports.StripeService = class StripeService {
+    constructor() {
         this.getStripe = () => {
             return this.stripe;
         };
-        this.stripe = new stripe_1.default(this.configService.get('STRIPE_SECRET_KEY'), {
+        this.stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
             apiVersion: '2023-08-16',
             typescript: true,
         });
     }
 };
-StripeService = __decorate([
+exports.StripeService = StripeService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __metadata("design:paramtypes", [])
 ], StripeService);
-exports.StripeService = StripeService;
 //# sourceMappingURL=stripe.js.map

@@ -16,6 +16,7 @@ const update_dto_1 = require("./update.dto");
 const note_detail_upsert_dto_1 = require("./note-detail-upsert.dto");
 class NoteDetailGenerateDto {
 }
+exports.NoteDetailGenerateDto = NoteDetailGenerateDto;
 __decorate([
     (0, custom_validator_1.IsTranscriptLongerThan500Characters)(),
     (0, class_validator_1.IsNotEmpty)(),
@@ -31,5 +32,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], NoteDetailGenerateDto.prototype, "patientGender", void 0);
-exports.NoteDetailGenerateDto = NoteDetailGenerateDto;
 //# sourceMappingURL=note-detail-generate.dto.js.map

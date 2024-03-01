@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as firebase from 'firebase-admin';
 
 @Injectable()
@@ -7,13 +6,12 @@ export class FirebaseApp {
   private firebaseApp: firebase.app.App;
   private firebaseConfig: any;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor() {
     this.firebaseConfig = {
-      clientEmail: this.configService.get<string>('FIREBASE_CLIENT_EMAIL'),
-      projectId: this.configService.get<string>('FIREBASE_PROJECT_ID'),
-      privateKey: this.configService.get<string>('FIREBASE_PRIVATE_KEY')
-        ? this.configService
-            .get<string>('FIREBASE_PRIVATE_KEY')
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY
+        ? process.env.FIREBASE_PRIVATE_KEY
             .replace(/\\n/g, '\n')
         : undefined,
     };

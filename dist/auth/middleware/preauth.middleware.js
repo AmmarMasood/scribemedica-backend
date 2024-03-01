@@ -14,7 +14,7 @@ exports.PreAuthMiddleware = void 0;
 const common_1 = require("@nestjs/common");
 const firebase_app_1 = require("../firebase-app");
 const common_2 = require("@nestjs/common");
-let PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
+let PreAuthMiddleware = exports.PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
     constructor(firebaseApp) {
         this.firebaseApp = firebaseApp;
         this.auth = firebaseApp.getAuth();
@@ -52,9 +52,8 @@ let PreAuthMiddleware = PreAuthMiddleware_1 = class PreAuthMiddleware {
         });
     }
 };
-PreAuthMiddleware = PreAuthMiddleware_1 = __decorate([
+exports.PreAuthMiddleware = PreAuthMiddleware = PreAuthMiddleware_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [firebase_app_1.FirebaseApp])
 ], PreAuthMiddleware);
-exports.PreAuthMiddleware = PreAuthMiddleware;
 //# sourceMappingURL=preauth.middleware.js.map

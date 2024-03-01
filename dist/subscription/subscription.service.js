@@ -20,40 +20,38 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const stripe_1 = require("./config/stripe");
 const profile_schema_1 = require("../auth/schemas/profile.schema");
-const config_1 = require("@nestjs/config");
-let SubscriptionService = class SubscriptionService {
-    constructor(subscriptionPlanModel, profileModel, configService, stripeService) {
+let SubscriptionService = exports.SubscriptionService = class SubscriptionService {
+    constructor(subscriptionPlanModel, profileModel, stripeService) {
         this.subscriptionPlanModel = subscriptionPlanModel;
         this.profileModel = profileModel;
-        this.configService = configService;
         this.stripeService = stripeService;
         this.storeSubscriptionPlans = [
             {
                 id: 'tier1-yearly',
                 name: 'Tier 1 Yearly',
                 description: '375 notes/month',
-                stripePriceId: this.configService.get('STRIPE_TIER_1_YEARLY_PRICE_ID'),
+                stripePriceId: process.env.STRIPE_TIER_1_YEARLY_PRICE_ID,
                 price: 1200,
             },
             {
                 id: 'tier1-monthly',
                 name: 'Tier 1 Monthly',
                 description: '375 notes/month',
-                stripePriceId: this.configService.get('STRIPE_TIER_1_MONTHLY_ID'),
+                stripePriceId: process.env.STRIPE_TIER_1_MONTHLY_ID,
                 price: 120,
             },
             {
                 id: 'tier2-yearly',
                 name: 'Tier 2 Yearly',
                 description: '100 notes/month',
-                stripePriceId: this.configService.get('STRIPE_TIER_2_YEARLY_PRICE_ID'),
+                stripePriceId: process.env.STRIPE_TIER_2_YEARLY_PRICE_ID,
                 price: 600,
             },
             {
                 id: 'tier2-monthly',
                 name: 'Tier 2 Monthly',
                 description: '100 notes/month',
-                stripePriceId: this.configService.get('STRIPE_TIER_2_MONTHLY_ID'),
+                stripePriceId: process.env.STRIPE_TIER_2_MONTHLY_ID,
                 price: 60,
             },
         ];
@@ -74,7 +72,7 @@ let SubscriptionService = class SubscriptionService {
         let event;
         const stripe = this.stripeService.getStripe();
         try {
-            event = stripe.webhooks.constructEvent(requestBody, signature, this.configService.get('STRIPE_WEBHOOK_SECRECT_PROD'));
+            event = stripe.webhooks.constructEvent(requestBody, signature, process.env.STRIPE_WEBHOOK_SECRECT_PROD);
             const session = event.data.object;
             console.log('============> WEBHOOK session', session);
             console.log('============> WEBHOOK event', event);
@@ -178,14 +176,12 @@ let SubscriptionService = class SubscriptionService {
         }
     }
 };
-SubscriptionService = __decorate([
+exports.SubscriptionService = SubscriptionService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(subscription_plan_schema_1.SubscriptionPlan.name)),
     __param(1, (0, mongoose_1.InjectModel)(profile_schema_1.Profile.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
-        config_1.ConfigService,
         stripe_1.StripeService])
 ], SubscriptionService);
-exports.SubscriptionService = SubscriptionService;
 //# sourceMappingURL=subscription.service.js.map

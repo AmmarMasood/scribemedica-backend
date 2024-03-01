@@ -11,11 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirebaseApp = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const firebase = require("firebase-admin");
-let FirebaseApp = class FirebaseApp {
-    constructor(configService) {
-        this.configService = configService;
+let FirebaseApp = exports.FirebaseApp = class FirebaseApp {
+    constructor() {
         this.getAuth = () => {
             return this.firebaseApp.auth();
         };
@@ -23,11 +21,10 @@ let FirebaseApp = class FirebaseApp {
             return this.firebaseApp.firestore();
         };
         this.firebaseConfig = {
-            clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
-            projectId: this.configService.get('FIREBASE_PROJECT_ID'),
-            privateKey: this.configService.get('FIREBASE_PRIVATE_KEY')
-                ? this.configService
-                    .get('FIREBASE_PRIVATE_KEY')
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY
+                ? process.env.FIREBASE_PRIVATE_KEY
                     .replace(/\\n/g, '\n')
                 : undefined,
         };
@@ -36,9 +33,8 @@ let FirebaseApp = class FirebaseApp {
         });
     }
 };
-FirebaseApp = __decorate([
+exports.FirebaseApp = FirebaseApp = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __metadata("design:paramtypes", [])
 ], FirebaseApp);
-exports.FirebaseApp = FirebaseApp;
 //# sourceMappingURL=firebase-app.js.map

@@ -20,7 +20,7 @@ const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const note_detail_schema_1 = require("../notes/schemas/note-detail.schema");
 const note_schema_1 = require("../notes/schemas/note.schema");
-let AdminService = class AdminService {
+let AdminService = exports.AdminService = class AdminService {
     constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel) {
         this.noteModel = noteModel;
         this.noteDetailModel = noteDetailModel;
@@ -268,7 +268,7 @@ let AdminService = class AdminService {
         }
     }
 };
-AdminService = __decorate([
+exports.AdminService = AdminService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(note_schema_1.Note.name)),
     __param(1, (0, mongoose_1.InjectModel)(note_detail_schema_1.NoteDetail.name)),
@@ -279,5 +279,4 @@ AdminService = __decorate([
         mongoose_2.Model,
         mongoose_2.Model])
 ], AdminService);
-exports.AdminService = AdminService;
 //# sourceMappingURL=admin.service.js.map

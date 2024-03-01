@@ -26,14 +26,12 @@ import { SubscriptionPlan } from './schemas/subscription-plan.schema';
 import { Model } from 'mongoose';
 import { StripeService } from './config/stripe';
 import { Profile } from 'src/auth/schemas/profile.schema';
-import { ConfigService } from '@nestjs/config';
 export declare class SubscriptionService {
     private subscriptionPlanModel;
     private profileModel;
-    private readonly configService;
     private readonly stripeService;
     private storeSubscriptionPlans;
-    constructor(subscriptionPlanModel: Model<SubscriptionPlan>, profileModel: Model<Profile>, configService: ConfigService, stripeService: StripeService);
+    constructor(subscriptionPlanModel: Model<SubscriptionPlan>, profileModel: Model<Profile>, stripeService: StripeService);
     getAllPlans(): Promise<any>;
     initalizeFreeSubscription(userId: string): Promise<import("mongoose").Document<unknown, {}, SubscriptionPlan> & SubscriptionPlan & {
         _id: import("mongoose").Types.ObjectId;

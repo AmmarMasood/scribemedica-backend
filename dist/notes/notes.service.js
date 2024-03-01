@@ -22,21 +22,19 @@ const openai_1 = require("openai");
 const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const plans_1 = require("../subscription/config/plans");
-const config_1 = require("@nestjs/config");
 const openai_2 = require("@azure/openai");
-let NotesService = class NotesService {
-    constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel, configService) {
+let NotesService = exports.NotesService = class NotesService {
+    constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel) {
         this.noteModel = noteModel;
         this.noteDetailModel = noteDetailModel;
         this.profileModel = profileModel;
         this.subscriptionPlanModel = subscriptionPlanModel;
-        this.configService = configService;
-        const apiKey = this.configService.get('GPT_KEY');
+        const apiKey = process.env.GPT_KEY;
         this.openai = new openai_1.default({
             apiKey: apiKey,
         });
-        const azureOpenAiApiKey = this.configService.get('AZURE_OPENAI_KEY');
-        const azureOpenAiEndpoint = this.configService.get('AZURE_ENDPOINT');
+        const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
+        const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
         this.azureOpenAi = new openai_2.OpenAIClient(azureOpenAiEndpoint, new openai_2.AzureKeyCredential(azureOpenAiApiKey));
     }
     async createNew(createDto, user) {
@@ -299,7 +297,7 @@ let NotesService = class NotesService {
         }
     }
 };
-NotesService = __decorate([
+exports.NotesService = NotesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(note_schema_1.Note.name)),
     __param(1, (0, mongoose_1.InjectModel)(note_detail_schema_1.NoteDetail.name)),
@@ -308,8 +306,6 @@ NotesService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
-        mongoose_2.Model,
-        config_1.ConfigService])
+        mongoose_2.Model])
 ], NotesService);
-exports.NotesService = NotesService;
 //# sourceMappingURL=notes.service.js.map

@@ -17,9 +17,9 @@ const subscription_module_1 = require("../subscription/subscription.module");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const note_schema_1 = require("../notes/schemas/note.schema");
 const stripe_1 = require("../subscription/config/stripe");
-let AuthModule = class AuthModule {
+let AuthModule = exports.AuthModule = class AuthModule {
 };
-AuthModule = __decorate([
+exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -42,5 +42,4 @@ AuthModule = __decorate([
         providers: [auth_service_1.AuthService, subscription_service_1.SubscriptionService, stripe_1.StripeService],
     })
 ], AuthModule);
-exports.AuthModule = AuthModule;
 //# sourceMappingURL=auth.module.js.map

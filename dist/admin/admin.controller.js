@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const admin_service_1 = require("./admin.service");
-let AdminController = class AdminController {
+let AdminController = exports.AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
@@ -101,9 +101,8 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "checkIfIsAdmin", null);
-AdminController = __decorate([
+exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('/private/admin'),
     __metadata("design:paramtypes", [admin_service_1.AdminService])
 ], AdminController);
-exports.AdminController = AdminController;
 //# sourceMappingURL=admin.controller.js.map

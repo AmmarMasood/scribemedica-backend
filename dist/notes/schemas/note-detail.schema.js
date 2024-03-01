@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteDetailSchema = exports.NoteDetail = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const note_detail_upsert_dto_1 = require("../dto/note-detail-upsert.dto");
-let NoteDetail = class NoteDetail {
+let NoteDetail = exports.NoteDetail = class NoteDetail {
 };
 __decorate([
     (0, mongoose_1.Prop)({ type: 'ObjectId', ref: 'Note', required: true }),
@@ -35,11 +35,10 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], NoteDetail.prototype, "modelUsed", void 0);
-NoteDetail = __decorate([
+exports.NoteDetail = NoteDetail = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
     })
 ], NoteDetail);
-exports.NoteDetail = NoteDetail;
 exports.NoteDetailSchema = mongoose_1.SchemaFactory.createForClass(NoteDetail);
 //# sourceMappingURL=note-detail.schema.js.map

@@ -21,7 +21,7 @@ const subscription_service_1 = require("../subscription/subscription.service");
 const plans_1 = require("../subscription/config/plans");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const note_schema_1 = require("../notes/schemas/note.schema");
-let AuthService = class AuthService {
+let AuthService = exports.AuthService = class AuthService {
     constructor(profileModel, noteModel, subscriptionPlanModel, subscriptionService) {
         this.profileModel = profileModel;
         this.noteModel = noteModel;
@@ -78,7 +78,7 @@ let AuthService = class AuthService {
         }
     }
 };
-AuthService = __decorate([
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(profile_schema_1.Profile.name)),
     __param(1, (0, mongoose_1.InjectModel)(note_schema_1.Note.name)),
@@ -88,5 +88,4 @@ AuthService = __decorate([
         mongoose_2.Model,
         mongoose_2.Model, Object])
 ], AuthService);
-exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

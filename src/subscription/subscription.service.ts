@@ -10,7 +10,6 @@ import { Model } from 'mongoose';
 import type Stripe from 'stripe';
 import { StripeService } from './config/stripe';
 import { Profile } from 'src/auth/schemas/profile.schema';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SubscriptionService {
@@ -20,7 +19,6 @@ export class SubscriptionService {
     @InjectModel(SubscriptionPlan.name)
     private subscriptionPlanModel: Model<SubscriptionPlan>,
     @InjectModel(Profile.name) private profileModel: Model<Profile>,
-    private readonly configService: ConfigService,
     private readonly stripeService: StripeService,
   ) {
     this.storeSubscriptionPlans = [
@@ -28,36 +26,28 @@ export class SubscriptionService {
         id: 'tier1-yearly',
         name: 'Tier 1 Yearly',
         description: '375 notes/month',
-        stripePriceId: this.configService.get<string>(
-          'STRIPE_TIER_1_YEARLY_PRICE_ID',
-        ),
+        stripePriceId: process.env.STRIPE_TIER_1_YEARLY_PRICE_ID,
         price: 1200,
       },
       {
         id: 'tier1-monthly',
         name: 'Tier 1 Monthly',
         description: '375 notes/month',
-        stripePriceId: this.configService.get<string>(
-          'STRIPE_TIER_1_MONTHLY_ID',
-        ),
+        stripePriceId: process.env.STRIPE_TIER_1_MONTHLY_ID,
         price: 120,
       },
       {
         id: 'tier2-yearly',
         name: 'Tier 2 Yearly',
         description: '100 notes/month',
-        stripePriceId: this.configService.get<string>(
-          'STRIPE_TIER_2_YEARLY_PRICE_ID',
-        ),
+        stripePriceId: process.env.STRIPE_TIER_2_YEARLY_PRICE_ID,
         price: 600,
       },
       {
         id: 'tier2-monthly',
         name: 'Tier 2 Monthly',
         description: '100 notes/month',
-        stripePriceId: this.configService.get<string>(
-          'STRIPE_TIER_2_MONTHLY_ID',
-        ),
+        stripePriceId: process.env.STRIPE_TIER_2_MONTHLY_ID,
         price: 60,
       },
     ];
@@ -83,7 +73,7 @@ export class SubscriptionService {
       event = stripe.webhooks.constructEvent(
         requestBody,
         signature,
-        this.configService.get<string>('STRIPE_WEBHOOK_SECRECT_PROD'),
+       process.env.STRIPE_WEBHOOK_SECRECT_PROD
       );
       const session = event.data.object as Stripe.Checkout.Session;
 

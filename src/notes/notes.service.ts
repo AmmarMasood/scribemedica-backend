@@ -20,7 +20,6 @@ import {
   SubscriptionPlans,
   isFreePlanActive,
 } from 'src/subscription/config/plans';
-import { ConfigService } from '@nestjs/config';
 import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 @Injectable()
@@ -32,17 +31,16 @@ export class NotesService {
     @InjectModel(NoteDetail.name) private noteDetailModel: Model<NoteDetail>,
     @InjectModel(Profile.name) private profileModel: Model<Profile>,
     @InjectModel(SubscriptionPlan.name)
-    private subscriptionPlanModel: Model<SubscriptionPlan>,
-    private readonly configService: ConfigService,
+    private subscriptionPlanModel: Model<SubscriptionPlan>
   ) {
-    const apiKey = this.configService.get<string>('GPT_KEY');
+    const apiKey = process.env.GPT_KEY
     this.openai = new OpenAI({
       apiKey: apiKey,
     });
     const azureOpenAiApiKey =
-      this.configService.get<string>('AZURE_OPENAI_KEY');
+    process.env.AZURE_OPENAI_KEY
     const azureOpenAiEndpoint =
-      this.configService.get<string>('AZURE_ENDPOINT');
+    process.env.AZURE_ENDPOINT
 
     this.azureOpenAi = new OpenAIClient(
       azureOpenAiEndpoint,

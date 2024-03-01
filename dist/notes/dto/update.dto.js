@@ -16,9 +16,10 @@ var PatientGender;
     PatientGender["SHE"] = "she/her";
     PatientGender["HE"] = "he/him";
     PatientGender["THEY"] = "they/them";
-})(PatientGender = exports.PatientGender || (exports.PatientGender = {}));
+})(PatientGender || (exports.PatientGender = PatientGender = {}));
 class UpdateDto {
 }
+exports.UpdateDto = UpdateDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -49,5 +50,4 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Boolean)
 ], UpdateDto.prototype, "finalized", void 0);
-exports.UpdateDto = UpdateDto;
 //# sourceMappingURL=update.dto.js.map
