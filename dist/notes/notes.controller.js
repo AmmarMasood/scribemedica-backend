@@ -19,7 +19,7 @@ const create_dto_1 = require("./dto/create.dto");
 const update_dto_1 = require("./dto/update.dto");
 const note_detail_upsert_dto_1 = require("./dto/note-detail-upsert.dto");
 const note_detail_generate_dto_1 = require("./dto/note-detail-generate.dto");
-let NotesController = exports.NotesController = class NotesController {
+let NotesController = class NotesController {
     constructor(notesService) {
         this.notesService = notesService;
     }
@@ -118,8 +118,9 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], NotesController.prototype, "deletenote", null);
-exports.NotesController = NotesController = __decorate([
+NotesController = __decorate([
     (0, common_1.Controller)('/private/notes'),
     __metadata("design:paramtypes", [notes_service_1.NotesService])
 ], NotesController);
+exports.NotesController = NotesController;
 //# sourceMappingURL=notes.controller.js.map

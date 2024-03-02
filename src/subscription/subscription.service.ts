@@ -73,7 +73,7 @@ export class SubscriptionService {
       event = stripe.webhooks.constructEvent(
         requestBody,
         signature,
-       process.env.STRIPE_WEBHOOK_SECRECT_PROD
+        process.env.STRIPE_WEBHOOK_SECRECT_PROD,
       );
       const session = event.data.object as Stripe.Checkout.Session;
 
@@ -84,7 +84,7 @@ export class SubscriptionService {
       if (event.type === 'customer.subscription.updated') {
         // Handle subscription cancellation
 
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as any;
 
         if (subscription.canceled_at !== null) {
           await this.subscriptionPlanModel.findOneAndUpdate(
@@ -194,7 +194,7 @@ export class SubscriptionService {
       if (event.type === 'subscription_schedule.canceled') {
         // Handle subscription cancellation
 
-        const canceledSubscription = event.data.object as Stripe.Subscription;
+        const canceledSubscription = event.data.object as any;
 
         await this.subscriptionPlanModel.findOneAndUpdate(
           {
@@ -214,7 +214,7 @@ export class SubscriptionService {
       if (event.type === 'customer.subscription.deleted') {
         // Handle subscription cancellation
 
-        const canceledSubscription = event.data.object as Stripe.Subscription;
+        const canceledSubscription = event.data.object as any;
 
         await this.subscriptionPlanModel.findOneAndUpdate(
           {

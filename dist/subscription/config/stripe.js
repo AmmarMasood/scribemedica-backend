@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StripeService = void 0;
 const common_1 = require("@nestjs/common");
 const stripe_1 = require("stripe");
-let StripeService = exports.StripeService = class StripeService {
+let StripeService = class StripeService {
     constructor() {
         this.getStripe = () => {
             return this.stripe;
@@ -23,8 +23,9 @@ let StripeService = exports.StripeService = class StripeService {
         });
     }
 };
-exports.StripeService = StripeService = __decorate([
+StripeService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], StripeService);
+exports.StripeService = StripeService;
 //# sourceMappingURL=stripe.js.map

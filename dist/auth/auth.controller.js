@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const register_dto_1 = require("./dto/register.dto");
 const updateProfile_dto_1 = require("./dto/updateProfile.dto");
-let AuthController = exports.AuthController = class AuthController {
+let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
@@ -53,8 +53,9 @@ __decorate([
     __metadata("design:paramtypes", [Object, updateProfile_dto_1.ProfileUpdateDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "profileUpdate", null);
-exports.AuthController = AuthController = __decorate([
+AuthController = __decorate([
     (0, common_1.Controller)('/'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
+exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

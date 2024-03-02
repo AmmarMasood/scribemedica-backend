@@ -23,7 +23,7 @@ const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const plans_1 = require("../subscription/config/plans");
 const openai_2 = require("@azure/openai");
-let NotesService = exports.NotesService = class NotesService {
+let NotesService = class NotesService {
     constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel) {
         this.noteModel = noteModel;
         this.noteDetailModel = noteDetailModel;
@@ -297,7 +297,7 @@ let NotesService = exports.NotesService = class NotesService {
         }
     }
 };
-exports.NotesService = NotesService = __decorate([
+NotesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(note_schema_1.Note.name)),
     __param(1, (0, mongoose_1.InjectModel)(note_detail_schema_1.NoteDetail.name)),
@@ -308,4 +308,5 @@ exports.NotesService = NotesService = __decorate([
         mongoose_2.Model,
         mongoose_2.Model])
 ], NotesService);
+exports.NotesService = NotesService;
 //# sourceMappingURL=notes.service.js.map

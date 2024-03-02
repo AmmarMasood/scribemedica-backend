@@ -18,7 +18,7 @@ const preauth_middleware_1 = require("./auth/middleware/preauth.middleware");
 const notes_module_1 = require("./notes/notes.module");
 const subscription_module_1 = require("./subscription/subscription.module");
 const admin_module_1 = require("./admin/admin.module");
-let AppModule = exports.AppModule = class AppModule {
+let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(preauth_middleware_1.PreAuthMiddleware).forRoutes({
             path: '/private/*',
@@ -26,7 +26,7 @@ let AppModule = exports.AppModule = class AppModule {
         });
     }
 };
-exports.AppModule = AppModule = __decorate([
+AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
@@ -42,4 +42,5 @@ exports.AppModule = AppModule = __decorate([
         providers: [app_service_1.AppService, firebase_app_1.FirebaseApp],
     })
 ], AppModule);
+exports.AppModule = AppModule;
 //# sourceMappingURL=app.module.js.map

@@ -23,7 +23,7 @@ var NoteType;
     NoteType["OUTPATIENT"] = "outpatient";
     NoteType["DICTATION"] = "dictation";
 })(NoteType || (NoteType = {}));
-let Note = exports.Note = class Note {
+let Note = class Note {
 };
 __decorate([
     (0, mongoose_1.Prop)({ type: String, ref: 'Profile', required: true }),
@@ -69,10 +69,11 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Note.prototype, "finalized", void 0);
-exports.Note = Note = __decorate([
+Note = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
     })
 ], Note);
+exports.Note = Note;
 exports.NoteSchema = mongoose_1.SchemaFactory.createForClass(Note);
 //# sourceMappingURL=note.schema.js.map

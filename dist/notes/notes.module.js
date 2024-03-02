@@ -15,9 +15,9 @@ const note_schema_1 = require("./schemas/note.schema");
 const note_detail_schema_1 = require("./schemas/note-detail.schema");
 const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
-let NotesModule = exports.NotesModule = class NotesModule {
+let NotesModule = class NotesModule {
 };
-exports.NotesModule = NotesModule = __decorate([
+NotesModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -43,4 +43,5 @@ exports.NotesModule = NotesModule = __decorate([
         providers: [notes_service_1.NotesService],
     })
 ], NotesModule);
+exports.NotesModule = NotesModule;
 //# sourceMappingURL=notes.module.js.map

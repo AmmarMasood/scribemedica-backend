@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubscriptionController = void 0;
 const common_1 = require("@nestjs/common");
 const subscription_service_1 = require("./subscription.service");
-let SubscriptionController = exports.SubscriptionController = class SubscriptionController {
+let SubscriptionController = class SubscriptionController {
     constructor(subscriptionService) {
         this.subscriptionService = subscriptionService;
     }
@@ -40,8 +40,9 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], SubscriptionController.prototype, "stripeWebhook", null);
-exports.SubscriptionController = SubscriptionController = __decorate([
+SubscriptionController = __decorate([
     (0, common_1.Controller)('/'),
     __metadata("design:paramtypes", [subscription_service_1.SubscriptionService])
 ], SubscriptionController);
+exports.SubscriptionController = SubscriptionController;
 //# sourceMappingURL=subscription.controller.js.map

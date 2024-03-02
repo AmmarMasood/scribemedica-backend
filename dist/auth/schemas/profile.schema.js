@@ -17,7 +17,7 @@ var UserRole;
     UserRole["ADMIN"] = "ADMIN";
     UserRole["USER"] = "USER";
 })(UserRole || (UserRole = {}));
-let Profile = exports.Profile = class Profile {
+let Profile = class Profile {
 };
 __decorate([
     (0, mongoose_1.Prop)(),
@@ -70,10 +70,11 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Profile.prototype, "notesCreated", void 0);
-exports.Profile = Profile = __decorate([
+Profile = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
     })
 ], Profile);
+exports.Profile = Profile;
 exports.ProfileSchema = mongoose_1.SchemaFactory.createForClass(Profile);
 //# sourceMappingURL=profile.schema.js.map

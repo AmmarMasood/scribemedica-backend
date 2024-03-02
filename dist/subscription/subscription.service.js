@@ -20,7 +20,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const stripe_1 = require("./config/stripe");
 const profile_schema_1 = require("../auth/schemas/profile.schema");
-let SubscriptionService = exports.SubscriptionService = class SubscriptionService {
+let SubscriptionService = class SubscriptionService {
     constructor(subscriptionPlanModel, profileModel, stripeService) {
         this.subscriptionPlanModel = subscriptionPlanModel;
         this.profileModel = profileModel;
@@ -176,7 +176,7 @@ let SubscriptionService = exports.SubscriptionService = class SubscriptionServic
         }
     }
 };
-exports.SubscriptionService = SubscriptionService = __decorate([
+SubscriptionService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(subscription_plan_schema_1.SubscriptionPlan.name)),
     __param(1, (0, mongoose_1.InjectModel)(profile_schema_1.Profile.name)),
@@ -184,4 +184,5 @@ exports.SubscriptionService = SubscriptionService = __decorate([
         mongoose_2.Model,
         stripe_1.StripeService])
 ], SubscriptionService);
+exports.SubscriptionService = SubscriptionService;
 //# sourceMappingURL=subscription.service.js.map

@@ -16,10 +16,9 @@ var NoteType;
 (function (NoteType) {
     NoteType["SYSTEM_BASED_ASSESSMENT_AND_PLAN"] = "System Based Assessment And Plan";
     NoteType["CLINICAL_DISCUSSION"] = "Clinical Discussion";
-})(NoteType || (exports.NoteType = NoteType = {}));
+})(NoteType = exports.NoteType || (exports.NoteType = {}));
 class NoteDetailUpsertDto {
 }
-exports.NoteDetailUpsertDto = NoteDetailUpsertDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -45,4 +44,5 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], NoteDetailUpsertDto.prototype, "patientGender", void 0);
+exports.NoteDetailUpsertDto = NoteDetailUpsertDto;
 //# sourceMappingURL=note-detail-upsert.dto.js.map

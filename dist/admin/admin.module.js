@@ -15,9 +15,9 @@ const admin_service_1 = require("./admin.service");
 const mongoose_1 = require("@nestjs/mongoose");
 const note_schema_1 = require("../notes/schemas/note.schema");
 const note_detail_schema_1 = require("../notes/schemas/note-detail.schema");
-let AdminModule = exports.AdminModule = class AdminModule {
+let AdminModule = class AdminModule {
 };
-exports.AdminModule = AdminModule = __decorate([
+AdminModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -43,4 +43,5 @@ exports.AdminModule = AdminModule = __decorate([
         providers: [admin_service_1.AdminService],
     })
 ], AdminModule);
+exports.AdminModule = AdminModule;
 //# sourceMappingURL=admin.module.js.map

@@ -13,7 +13,6 @@ exports.RegisterDto = void 0;
 const class_validator_1 = require("class-validator");
 class RegisterDto {
 }
-exports.RegisterDto = RegisterDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -24,4 +23,5 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "userId", void 0);
+exports.RegisterDto = RegisterDto;
 //# sourceMappingURL=login.dto.js.map

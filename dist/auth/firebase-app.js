@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirebaseApp = void 0;
 const common_1 = require("@nestjs/common");
 const firebase = require("firebase-admin");
-let FirebaseApp = exports.FirebaseApp = class FirebaseApp {
+let FirebaseApp = class FirebaseApp {
     constructor() {
         this.getAuth = () => {
             return this.firebaseApp.auth();
@@ -33,8 +33,9 @@ let FirebaseApp = exports.FirebaseApp = class FirebaseApp {
         });
     }
 };
-exports.FirebaseApp = FirebaseApp = __decorate([
+FirebaseApp = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], FirebaseApp);
+exports.FirebaseApp = FirebaseApp;
 //# sourceMappingURL=firebase-app.js.map
