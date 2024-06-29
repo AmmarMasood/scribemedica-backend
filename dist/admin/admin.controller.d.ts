@@ -39,6 +39,7 @@ export declare class AdminController {
         transcription: string;
         recordingLength: number;
         finalized: boolean;
+        deleted: boolean;
         _id: import("mongoose").Types.ObjectId;
     }[]>;
     getNoteDetail(noteId: string, req: any): Promise<{

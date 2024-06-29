@@ -56,7 +56,18 @@ let AuthService = class AuthService {
                 userId: user.userId,
             });
             const subscription = await this.subscriptionPlanModel.findById(profile.subscriptionId);
-            const notes = await this.noteModel.count({ userId: user.userId });
+            let notes;
+            if (subscription.planId === plans_1.SubscriptionPlans.FREE) {
+                notes = await this.noteModel.count({
+                    userId: user.userId,
+                });
+            }
+            else {
+                notes = await this.noteModel.count({
+                    userId: user.userId,
+                    deleted: { $ne: true },
+                });
+            }
             return {
                 profile: profile,
                 notesCount: notes,

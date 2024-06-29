@@ -15,11 +15,16 @@ const config_1 = require("@nestjs/config");
 const auth_module_1 = require("./auth/auth.module");
 const firebase_app_1 = require("./auth/firebase-app");
 const preauth_middleware_1 = require("./auth/middleware/preauth.middleware");
+const request_logger_middleware_1 = require("./middlewares/request-logger.middleware");
 const notes_module_1 = require("./notes/notes.module");
 const subscription_module_1 = require("./subscription/subscription.module");
 const admin_module_1 = require("./admin/admin.module");
 let AppModule = class AppModule {
     configure(consumer) {
+        consumer.apply(request_logger_middleware_1.RequestLoggerMiddleware).forRoutes({
+            path: '*',
+            method: common_1.RequestMethod.ALL,
+        });
         consumer.apply(preauth_middleware_1.PreAuthMiddleware).forRoutes({
             path: '/private/*',
             method: common_1.RequestMethod.ALL,

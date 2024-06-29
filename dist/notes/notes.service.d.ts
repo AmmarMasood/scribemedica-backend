@@ -82,6 +82,7 @@ export declare class NotesService {
         transcription: string;
         recordingLength: number;
         finalized: boolean;
+        deleted: boolean;
         _id: import("mongoose").Types.ObjectId;
     }[]>;
     getNoteDetails(noteId: string, user: any): Promise<{
@@ -96,5 +97,8 @@ export declare class NotesService {
         note: import("mongoose").Document<unknown, {}, Note> & Note & {
             _id: import("mongoose").Types.ObjectId;
         };
+    }>;
+    hardDeleteOldNotes(): Promise<{
+        deletedNotes: number;
     }>;
 }

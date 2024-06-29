@@ -28,6 +28,7 @@ export declare class NoteDetail {
     medicalNote: string;
     noteType: string;
     modelUsed: string;
+    deleted: boolean;
 }
 export declare const NoteDetailSchema: import("mongoose").Schema<NoteDetail, import("mongoose").Model<NoteDetail, any, any, any, import("mongoose").Document<unknown, any, NoteDetail> & NoteDetail & {
     _id: import("mongoose").Types.ObjectId;

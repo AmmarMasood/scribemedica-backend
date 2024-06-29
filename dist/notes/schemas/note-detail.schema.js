@@ -35,6 +35,10 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], NoteDetail.prototype, "modelUsed", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Boolean)
+], NoteDetail.prototype, "deleted", void 0);
 NoteDetail = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

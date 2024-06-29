@@ -47,6 +47,9 @@ let NotesController = class NotesController {
     async deletenote(req, noteId) {
         return await this.notesService.deleteNote(req['user'], noteId);
     }
+    async cleanupNotes(req) {
+        return await this.notesService.hardDeleteOldNotes();
+    }
 };
 __decorate([
     (0, common_1.Get)(),
@@ -118,6 +121,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], NotesController.prototype, "deletenote", null);
+__decorate([
+    (0, common_1.Delete)('/cleanup/notes'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], NotesController.prototype, "cleanupNotes", null);
 NotesController = __decorate([
     (0, common_1.Controller)('/private/notes'),
     __metadata("design:paramtypes", [notes_service_1.NotesService])

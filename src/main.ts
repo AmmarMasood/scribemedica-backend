@@ -6,15 +6,22 @@ require('dotenv').config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.init();
-  app.enableCors();
+  app.enableCors({
+    origin: '*', // replace with your client app URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+  console.log('something....app');
   app.use(rawBodyMiddleware());
+  await app.init();
+  console.log('something....app 2');
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Remove unknown properties from DTOs
     }),
   );
-  const port = process.env.SERVER_PORT || 3000;
+  const port = process.env.PORT || 3000;
   await app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });

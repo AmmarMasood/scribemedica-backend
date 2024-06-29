@@ -71,11 +71,14 @@ let SubscriptionService = class SubscriptionService {
         var _a;
         let event;
         const stripe = this.stripeService.getStripe();
+        console.log('============> WEBHOOK start', requestBody, signature, process.env.STRIPE_WEBHOOK_SECRECT_PROD);
         try {
             event = stripe.webhooks.constructEvent(requestBody, signature, process.env.STRIPE_WEBHOOK_SECRECT_PROD);
+            console.log('============> WEBHOOK event', event);
             const session = event.data.object;
             console.log('============> WEBHOOK session', session);
             console.log('============> WEBHOOK event', event);
+            ``;
             if (event.type === 'customer.subscription.updated') {
                 const subscription = event.data.object;
                 if (subscription.canceled_at !== null) {

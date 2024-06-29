@@ -29,7 +29,7 @@ export const getNotesBasedOnPlan = (plan: SubscriptionPlans) => {
     case SubscriptionPlans.TIER2_MONTHLY:
       return 100;
     case SubscriptionPlans.FREE:
-      return 5;
+      return 10;
     default:
       return 0;
   }

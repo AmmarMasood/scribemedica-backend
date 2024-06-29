@@ -44,6 +44,7 @@ export declare class NotesController {
         transcription: string;
         recordingLength: number;
         finalized: boolean;
+        deleted: boolean;
         _id: import("mongoose").Types.ObjectId;
     }[]>;
     getNoteDetails(noteId: string, req: Request): Promise<{
@@ -81,5 +82,8 @@ export declare class NotesController {
         note: import("mongoose").Document<unknown, {}, import("./schemas/note.schema").Note> & import("./schemas/note.schema").Note & {
             _id: import("mongoose").Types.ObjectId;
         };
+    }>;
+    cleanupNotes(req: Request): Promise<{
+        deletedNotes: number;
     }>;
 }

@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { FirebaseApp } from './auth/firebase-app';
 import { PreAuthMiddleware } from './auth/middleware/preauth.middleware';
+import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
 import { NotesModule } from './notes/notes.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { AdminModule } from './admin/admin.module';
@@ -32,6 +33,10 @@ import { AdminModule } from './admin/admin.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(RequestLoggerMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
     consumer.apply(PreAuthMiddleware).forRoutes({
       path: '/private/*',
       method: RequestMethod.ALL,

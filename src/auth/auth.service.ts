@@ -4,7 +4,10 @@ import { Profile } from './schemas/profile.schema';
 import { Model } from 'mongoose';
 import { RegisterDto } from './dto/register.dto';
 import { SubscriptionService } from 'src/subscription/subscription.service';
-import { getNotesBasedOnPlan } from 'src/subscription/config/plans';
+import {
+  SubscriptionPlans,
+  getNotesBasedOnPlan,
+} from 'src/subscription/config/plans';
 import { SubscriptionPlan } from 'src/subscription/schemas/subscription-plan.schema';
 import { ProfileUpdateDto } from './dto/updateProfile.dto';
 import { Note } from 'src/notes/schemas/note.schema';
@@ -52,7 +55,18 @@ export class AuthService {
       const subscription = await this.subscriptionPlanModel.findById(
         profile.subscriptionId,
       );
-      const notes = await this.noteModel.count({ userId: user.userId });
+      let notes;
+      if (subscription.planId === SubscriptionPlans.FREE) {
+        notes = await this.noteModel.count({
+          userId: user.userId,
+        });
+      } else {
+        notes = await this.noteModel.count({
+          userId: user.userId,
+          deleted: { $ne: true },
+        });
+      }
+
       return {
         profile: profile,
         notesCount: notes,

@@ -12,8 +12,10 @@ function rawBodyMiddleware() {
       response: Response,
       buffer: Buffer,
     ) => {
+      console.log('checking', request.url, buffer, Buffer.isBuffer(buffer));
       if (request.url === '/webhook' && Buffer.isBuffer(buffer)) {
         request.rawBody = Buffer.from(buffer);
+        console.log('checking 2', request.rawBody);
       }
       return true;
     },

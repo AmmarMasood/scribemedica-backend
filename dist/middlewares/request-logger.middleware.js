@@ -6,18 +6,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AppService = void 0;
+exports.RequestLoggerMiddleware = void 0;
 const common_1 = require("@nestjs/common");
-let AppService = class AppService {
-    getHello() {
-        return 'Hello World!';
-    }
-    getHealth() {
-        return 'Im healthy!';
+let RequestLoggerMiddleware = class RequestLoggerMiddleware {
+    use(req, res, next) {
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+        next();
     }
 };
-AppService = __decorate([
+RequestLoggerMiddleware = __decorate([
     (0, common_1.Injectable)()
-], AppService);
-exports.AppService = AppService;
-//# sourceMappingURL=app.service.js.map
+], RequestLoggerMiddleware);
+exports.RequestLoggerMiddleware = RequestLoggerMiddleware;
+//# sourceMappingURL=request-logger.middleware.js.map

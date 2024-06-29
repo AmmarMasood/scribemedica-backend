@@ -45,6 +45,7 @@ export declare class AdminService {
         transcription: string;
         recordingLength: number;
         finalized: boolean;
+        deleted: boolean;
         _id: import("mongoose").Types.ObjectId;
     }[]>;
     getNoteDetails(noteId: string, user: any): Promise<{

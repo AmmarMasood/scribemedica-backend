@@ -22,6 +22,9 @@ export class NoteDetail {
     required: [true, 'modelUsed is required'],
   })
   modelUsed: string;
+
+  @Prop()
+  deleted: boolean;
 }
 
 export const NoteDetailSchema = SchemaFactory.createForClass(NoteDetail);

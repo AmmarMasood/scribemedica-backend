@@ -37,7 +37,7 @@ export declare class AuthController {
         profile: import("mongoose").Document<unknown, {}, import("./schemas/profile.schema").Profile> & import("./schemas/profile.schema").Profile & {
             _id: import("mongoose").Types.ObjectId;
         };
-        notesCount: number;
+        notesCount: any;
         subscription: import("mongoose").Document<unknown, {}, import("../subscription/schemas/subscription-plan.schema").SubscriptionPlan> & import("../subscription/schemas/subscription-plan.schema").SubscriptionPlan & {
             _id: import("mongoose").Types.ObjectId;
         };

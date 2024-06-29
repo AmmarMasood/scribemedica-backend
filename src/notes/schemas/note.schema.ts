@@ -11,6 +11,8 @@ enum NoteType {
   INPATIENT = 'inpatient',
   OUTPATIENT = 'outpatient',
   DICTATION = 'dictation',
+  NEW_PATIENT = 'new patient',
+  RETURN_VISIT = 'return visit',
 }
 @Schema({
   timestamps: true,
@@ -28,6 +30,7 @@ export class Note {
   patientName: string;
 
   @Prop({
+    required: false,
     type: String,
     enum: Object.values(PatientGender), // Validate against enum values
   })
@@ -37,7 +40,7 @@ export class Note {
     required: [true, 'note type is required'],
     type: String,
     enum: Object.values(NoteType),
-    default: NoteType.INPATIENT,
+    default: NoteType.NEW_PATIENT,
   })
   type: string;
 
@@ -51,6 +54,9 @@ export class Note {
     required: [true, 'finalized is required'],
   })
   finalized: boolean;
+
+  @Prop()
+  deleted: boolean;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Note);

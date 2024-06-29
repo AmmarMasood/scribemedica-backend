@@ -22,6 +22,8 @@ var NoteType;
     NoteType["INPATIENT"] = "inpatient";
     NoteType["OUTPATIENT"] = "outpatient";
     NoteType["DICTATION"] = "dictation";
+    NoteType["NEW_PATIENT"] = "new patient";
+    NoteType["RETURN_VISIT"] = "return visit";
 })(NoteType || (NoteType = {}));
 let Note = class Note {
 };
@@ -41,6 +43,7 @@ __decorate([
 ], Note.prototype, "patientName", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
+        required: false,
         type: String,
         enum: Object.values(PatientGender),
     }),
@@ -51,7 +54,7 @@ __decorate([
         required: [true, 'note type is required'],
         type: String,
         enum: Object.values(NoteType),
-        default: NoteType.INPATIENT,
+        default: NoteType.NEW_PATIENT,
     }),
     __metadata("design:type", String)
 ], Note.prototype, "type", void 0);
@@ -69,6 +72,10 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Note.prototype, "finalized", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Boolean)
+], Note.prototype, "deleted", void 0);
 Note = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

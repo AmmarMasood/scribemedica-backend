@@ -10,6 +10,7 @@ import { Profile } from 'src/auth/schemas/profile.schema';
 import { SubscriptionPlan } from 'src/subscription/schemas/subscription-plan.schema';
 import { NoteDetail } from 'src/notes/schemas/note-detail.schema';
 import { Note } from 'src/notes/schemas/note.schema';
+import { auth } from 'firebase-admin';
 
 @Injectable()
 export class AdminService {
@@ -93,12 +94,14 @@ export class AdminService {
       this.isAdminUser(user);
       const note = await this.noteModel.findOne({
         _id: noteId,
+        deleted: { $ne: true },
       });
 
       if (!note) throw new Error('Unable to find note');
 
       const noteDetail = await this.noteDetailModel.findOne({
         noteId: note._id,
+        deleted: { $ne: true },
       });
 
       const userDetail = await this.profileModel.findOne({
@@ -143,19 +146,33 @@ export class AdminService {
       this.isAdminUser(user);
       const note = await this.noteModel.findOne({
         _id: noteId,
+        deleted: { $ne: true },
       });
-      const noteDetail = await this.noteDetailModel.findOne({
-        noteId: note._id,
-      });
-
       if (!note) throw new Error('Unable to find note');
 
-      await this.noteModel.deleteOne({
-        _id: note._id,
+      const noteDetail = await this.noteDetailModel.findOne({
+        noteId: note._id,
+        deleted: { $ne: true },
       });
-      await this.noteDetailModel.deleteOne({
-        _id: noteDetail._id,
-      });
+
+      await this.noteModel.updateOne(
+        {
+          _id: note._id,
+        },
+        {
+          deleted: true,
+        },
+      );
+      if (noteDetail) {
+        await this.noteDetailModel.updateOne(
+          {
+            _id: noteDetail._id,
+          },
+          {
+            deleted: true,
+          },
+        );
+      }
 
       return {
         note,
@@ -238,6 +255,9 @@ export class AdminService {
       });
       if (!profile) throw new Error('Unable to find user');
 
+      // delete user from firebase
+      await auth().deleteUser(userId);
+
       await this.profileModel.deleteOne({
         userId: profile.userId,
       });
@@ -276,7 +296,12 @@ export class AdminService {
       const subscription = await this.subscriptionPlanModel.findById(
         profile.subscriptionId,
       );
-      const notes = await this.noteModel.count({ userId: userId });
+      const notes = await this.noteModel.count({
+        userId: userId,
+        deleted: {
+          $ne: true,
+        },
+      });
       return {
         profile: profile,
         notesCount: notes,

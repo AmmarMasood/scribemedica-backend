@@ -20,6 +20,7 @@ const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const note_detail_schema_1 = require("../notes/schemas/note-detail.schema");
 const note_schema_1 = require("../notes/schemas/note.schema");
+const firebase_admin_1 = require("firebase-admin");
 let AdminService = class AdminService {
     constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel) {
         this.noteModel = noteModel;
@@ -70,11 +71,13 @@ let AdminService = class AdminService {
             this.isAdminUser(user);
             const note = await this.noteModel.findOne({
                 _id: noteId,
+                deleted: { $ne: true },
             });
             if (!note)
                 throw new Error('Unable to find note');
             const noteDetail = await this.noteDetailModel.findOne({
                 noteId: note._id,
+                deleted: { $ne: true },
             });
             const userDetail = await this.profileModel.findOne({
                 userId: note.userId,
@@ -115,18 +118,26 @@ let AdminService = class AdminService {
             this.isAdminUser(user);
             const note = await this.noteModel.findOne({
                 _id: noteId,
-            });
-            const noteDetail = await this.noteDetailModel.findOne({
-                noteId: note._id,
+                deleted: { $ne: true },
             });
             if (!note)
                 throw new Error('Unable to find note');
-            await this.noteModel.deleteOne({
+            const noteDetail = await this.noteDetailModel.findOne({
+                noteId: note._id,
+                deleted: { $ne: true },
+            });
+            await this.noteModel.updateOne({
                 _id: note._id,
+            }, {
+                deleted: true,
             });
-            await this.noteDetailModel.deleteOne({
-                _id: noteDetail._id,
-            });
+            if (noteDetail) {
+                await this.noteDetailModel.updateOne({
+                    _id: noteDetail._id,
+                }, {
+                    deleted: true,
+                });
+            }
             return {
                 note,
             };
@@ -190,6 +201,7 @@ let AdminService = class AdminService {
             });
             if (!profile)
                 throw new Error('Unable to find user');
+            await (0, firebase_admin_1.auth)().deleteUser(userId);
             await this.profileModel.deleteOne({
                 userId: profile.userId,
             });
@@ -221,7 +233,12 @@ let AdminService = class AdminService {
                 userId: userId,
             });
             const subscription = await this.subscriptionPlanModel.findById(profile.subscriptionId);
-            const notes = await this.noteModel.count({ userId: userId });
+            const notes = await this.noteModel.count({
+                userId: userId,
+                deleted: {
+                    $ne: true,
+                },
+            });
             return {
                 profile: profile,
                 notesCount: notes,

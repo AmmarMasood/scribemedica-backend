@@ -41,7 +41,7 @@ export declare class AuthService {
         profile: import("mongoose").Document<unknown, {}, Profile> & Profile & {
             _id: import("mongoose").Types.ObjectId;
         };
-        notesCount: number;
+        notesCount: any;
         subscription: import("mongoose").Document<unknown, {}, SubscriptionPlan> & SubscriptionPlan & {
             _id: import("mongoose").Types.ObjectId;
         };

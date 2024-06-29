@@ -97,4 +97,9 @@ export class NotesController {
   async deletenote(@Req() req: Request, @Param('noteId') noteId: string) {
     return await this.notesService.deleteNote(req['user'], noteId);
   }
+
+  @Delete('/cleanup/notes')
+  async cleanupNotes(@Req() req: Request) {
+    return await this.notesService.hardDeleteOldNotes();
+  }
 }

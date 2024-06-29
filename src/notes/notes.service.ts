@@ -31,16 +31,14 @@ export class NotesService {
     @InjectModel(NoteDetail.name) private noteDetailModel: Model<NoteDetail>,
     @InjectModel(Profile.name) private profileModel: Model<Profile>,
     @InjectModel(SubscriptionPlan.name)
-    private subscriptionPlanModel: Model<SubscriptionPlan>
+    private subscriptionPlanModel: Model<SubscriptionPlan>,
   ) {
-    const apiKey = process.env.GPT_KEY
+    const apiKey = process.env.GPT_KEY;
     this.openai = new OpenAI({
       apiKey: apiKey,
     });
-    const azureOpenAiApiKey =
-    process.env.AZURE_OPENAI_KEY
-    const azureOpenAiEndpoint =
-    process.env.AZURE_ENDPOINT
+    const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
+    const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
 
     this.azureOpenAi = new OpenAIClient(
       azureOpenAiEndpoint,
@@ -50,15 +48,18 @@ export class NotesService {
 
   async createNew(createDto: CreateDto, user: any) {
     try {
-      const { description, patientName, type, finalized } = createDto;
+      const { patientName, type, finalized } = createDto;
       const profile = await this.profileModel.findOne({
         userId: user.userId,
       });
-      const notes = await this.noteModel.find({ userId: user.userId });
+
       const subscription = await this.subscriptionPlanModel.findOne({
         userId: user.userId,
       });
       if (subscription.planId === SubscriptionPlans.FREE) {
+        const notes = await this.noteModel.find({
+          userId: user.userId,
+        });
         if (!isFreePlanActive(subscription)) {
           throw new Error('Your free plan has expired.');
         }
@@ -66,6 +67,10 @@ export class NotesService {
           throw new Error('You have reached your free plan notes limit');
         }
       } else {
+        const notes = await this.noteModel.find({
+          userId: user.userId,
+          deleted: { $ne: true },
+        });
         if (
           subscription.status === SubscriptionPlanStatus.CANCELLED ||
           subscription.status === SubscriptionPlanStatus.INACTIVE
@@ -77,7 +82,6 @@ export class NotesService {
         }
       }
       const newNote = await this.noteModel.create({
-        description,
         patientName,
         type,
         finalized,
@@ -94,6 +98,7 @@ export class NotesService {
         throw new BadRequestException(e.message);
       }
 
+      console.log('Error', e);
       throw new Error('Unable to create new note');
     }
   }
@@ -101,7 +106,6 @@ export class NotesService {
   async updateNote(updateDto: UpdateDto, user: any, noteId: string) {
     try {
       const {
-        description,
         patientName,
         patientGender,
         transcription,
@@ -112,9 +116,9 @@ export class NotesService {
         {
           _id: noteId,
           userId: user.userId,
+          deleted: { $ne: true },
         },
         {
-          description,
           patientName,
           patientGender,
           transcription,
@@ -179,6 +183,7 @@ export class NotesService {
       const updatedNoteDetail = await this.noteDetailModel.findOneAndUpdate(
         {
           _id: noteDetailId,
+          deleted: { $ne: true },
         },
         {
           ...noteDetailUpsertDto,
@@ -202,7 +207,7 @@ export class NotesService {
         userId: user.userId,
       });
 
-      const text = `Create a medical note based on with this transcript for the person with these pronouns ${noteDetailGenerateDto.patientGender} here is the transcript ${noteDetailGenerateDto.transcript}`;
+      const text = `Create a medical note based on with this transcript for the person here is the transcript ${noteDetailGenerateDto.transcript}`;
 
       if (profile.speciality) {
         text.concat(
@@ -336,7 +341,7 @@ export class NotesService {
   ) {
     try {
       // Define a filter object to filter notes based on noteType and search keyword
-      const filter: any = { userId: user.userId };
+      const filter: any = { userId: user.userId, deleted: { $ne: true } };
       if (noteType && noteType !== 'all') {
         filter.type = noteType;
       }
@@ -359,6 +364,7 @@ export class NotesService {
       // Retrieve note details for the filtered notes
       const noteDetails = await this.noteDetailModel.find({
         noteId: { $in: noteIds },
+        deleted: { $ne: true },
       });
 
       // Map notes with their details
@@ -383,12 +389,14 @@ export class NotesService {
       const note = await this.noteModel.findOne({
         _id: noteId,
         userId: user.userId,
+        deleted: { $ne: true },
       });
 
       if (!note) throw new Error('Unable to find note');
 
       const noteDetail = await this.noteDetailModel.findOne({
         noteId: note._id,
+        deleted: { $ne: true },
       });
 
       return {
@@ -406,18 +414,18 @@ export class NotesService {
         _id: noteId,
         userId: user.userId,
       });
+      if (!note) throw new Error('Unable to find note');
+
       const noteDetail = await this.noteDetailModel.findOne({
         noteId: note._id,
       });
 
-      if (!note) throw new Error('Unable to find note');
-
-      await this.noteModel.deleteOne({
-        _id: note._id,
-      });
-      await this.noteDetailModel.deleteOne({
-        _id: noteDetail._id,
-      });
+      note.deleted = true;
+      await note.save();
+      if (noteDetail) {
+        noteDetail.deleted = true;
+        await noteDetail.save();
+      }
 
       return {
         note,
@@ -425,5 +433,23 @@ export class NotesService {
     } catch (e) {
       throw new Error('Unable to delete note');
     }
+  }
+
+  async hardDeleteOldNotes() {
+    const days: number = parseInt(process.env.NOTES_EXPIRY_LIMIT_DAYS) || 30;
+    const notes = await this.noteModel.find({
+      createdAt: { $lt: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+    });
+    await this.noteModel.deleteMany({
+      createdAt: { $lt: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+    });
+
+    await this.noteDetailModel.deleteMany({
+      noteId: { $in: notes.map((note) => note._id) },
+    });
+
+    return {
+      deletedNotes: notes.length,
+    };
   }
 }

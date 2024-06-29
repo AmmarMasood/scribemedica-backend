@@ -39,15 +39,17 @@ let NotesService = class NotesService {
     }
     async createNew(createDto, user) {
         try {
-            const { description, patientName, type, finalized } = createDto;
+            const { patientName, type, finalized } = createDto;
             const profile = await this.profileModel.findOne({
                 userId: user.userId,
             });
-            const notes = await this.noteModel.find({ userId: user.userId });
             const subscription = await this.subscriptionPlanModel.findOne({
                 userId: user.userId,
             });
             if (subscription.planId === plans_1.SubscriptionPlans.FREE) {
+                const notes = await this.noteModel.find({
+                    userId: user.userId,
+                });
                 if (!(0, plans_1.isFreePlanActive)(subscription)) {
                     throw new Error('Your free plan has expired.');
                 }
@@ -56,6 +58,10 @@ let NotesService = class NotesService {
                 }
             }
             else {
+                const notes = await this.noteModel.find({
+                    userId: user.userId,
+                    deleted: { $ne: true },
+                });
                 if (subscription.status === plans_1.SubscriptionPlanStatus.CANCELLED ||
                     subscription.status === plans_1.SubscriptionPlanStatus.INACTIVE) {
                     throw new Error('Your subscription is not active');
@@ -65,7 +71,6 @@ let NotesService = class NotesService {
                 }
             }
             const newNote = await this.noteModel.create({
-                description,
                 patientName,
                 type,
                 finalized,
@@ -80,17 +85,18 @@ let NotesService = class NotesService {
                 e.message === 'You have reached your plan notes limit') {
                 throw new common_1.BadRequestException(e.message);
             }
+            console.log('Error', e);
             throw new Error('Unable to create new note');
         }
     }
     async updateNote(updateDto, user, noteId) {
         try {
-            const { description, patientName, patientGender, transcription, recordingLength, finalized, } = updateDto;
+            const { patientName, patientGender, transcription, recordingLength, finalized, } = updateDto;
             const updatedNote = await this.noteModel.findOneAndUpdate({
                 _id: noteId,
                 userId: user.userId,
+                deleted: { $ne: true },
             }, {
-                description,
                 patientName,
                 patientGender,
                 transcription,
@@ -140,6 +146,7 @@ let NotesService = class NotesService {
         try {
             const updatedNoteDetail = await this.noteDetailModel.findOneAndUpdate({
                 _id: noteDetailId,
+                deleted: { $ne: true },
             }, Object.assign({}, noteDetailUpsertDto));
             return {
                 updatedNoteDetail,
@@ -154,7 +161,7 @@ let NotesService = class NotesService {
             const profile = await this.profileModel.findOne({
                 userId: user.userId,
             });
-            const text = `Create a medical note based on with this transcript for the person with these pronouns ${noteDetailGenerateDto.patientGender} here is the transcript ${noteDetailGenerateDto.transcript}`;
+            const text = `Create a medical note based on with this transcript for the person here is the transcript ${noteDetailGenerateDto.transcript}`;
             if (profile.speciality) {
                 text.concat(` and the speciality of the doctor who wrote this transcript is ${profile.speciality}, so make sure to create a note based on that speciality`);
             }
@@ -224,7 +231,7 @@ let NotesService = class NotesService {
     }
     async getNotes(user, noteType, page, limit, search) {
         try {
-            const filter = { userId: user.userId };
+            const filter = { userId: user.userId, deleted: { $ne: true } };
             if (noteType && noteType !== 'all') {
                 filter.type = noteType;
             }
@@ -240,6 +247,7 @@ let NotesService = class NotesService {
             const noteIds = notes.map((note) => note._id);
             const noteDetails = await this.noteDetailModel.find({
                 noteId: { $in: noteIds },
+                deleted: { $ne: true },
             });
             const notesWithDetails = notes.map((note) => {
                 const noteDetail = noteDetails.find((detail) => detail.noteId.toString() === note._id.toString());
@@ -256,11 +264,13 @@ let NotesService = class NotesService {
             const note = await this.noteModel.findOne({
                 _id: noteId,
                 userId: user.userId,
+                deleted: { $ne: true },
             });
             if (!note)
                 throw new Error('Unable to find note');
             const noteDetail = await this.noteDetailModel.findOne({
                 noteId: note._id,
+                deleted: { $ne: true },
             });
             return {
                 note,
@@ -277,17 +287,17 @@ let NotesService = class NotesService {
                 _id: noteId,
                 userId: user.userId,
             });
+            if (!note)
+                throw new Error('Unable to find note');
             const noteDetail = await this.noteDetailModel.findOne({
                 noteId: note._id,
             });
-            if (!note)
-                throw new Error('Unable to find note');
-            await this.noteModel.deleteOne({
-                _id: note._id,
-            });
-            await this.noteDetailModel.deleteOne({
-                _id: noteDetail._id,
-            });
+            note.deleted = true;
+            await note.save();
+            if (noteDetail) {
+                noteDetail.deleted = true;
+                await noteDetail.save();
+            }
             return {
                 note,
             };
@@ -295,6 +305,21 @@ let NotesService = class NotesService {
         catch (e) {
             throw new Error('Unable to delete note');
         }
+    }
+    async hardDeleteOldNotes() {
+        const days = parseInt(process.env.NOTES_EXPIRY_LIMIT_DAYS) || 30;
+        const notes = await this.noteModel.find({
+            createdAt: { $lt: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+        });
+        await this.noteModel.deleteMany({
+            createdAt: { $lt: new Date(Date.now() - days * 24 * 60 * 60 * 1000) },
+        });
+        await this.noteDetailModel.deleteMany({
+            noteId: { $in: notes.map((note) => note._id) },
+        });
+        return {
+            deletedNotes: notes.length,
+        };
     }
 };
 NotesService = __decorate([
