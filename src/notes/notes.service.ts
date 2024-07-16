@@ -62,9 +62,9 @@ export class NotesService {
         const notes = await this.noteModel.find({
           userId: user.userId,
         });
-        if (!isFreePlanActive(subscription)) {
-          throw new Error('Your free plan has expired.');
-        }
+        // if (!isFreePlanActive(subscription)) {
+        //   throw new Error('Your free plan has expired.');
+        // }
         if (profile.notesAllowed <= notes.length) {
           throw new Error('You have reached your free plan notes limit');
         }

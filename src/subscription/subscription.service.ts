@@ -83,25 +83,15 @@ export class SubscriptionService {
   async handleStripeWebhook(requestBody: any, signature: any): Promise<any> {
     let event: Stripe.Event;
     const stripe = this.stripeService.getStripe();
-    console.log(
-      '============> WEBHOOK start',
-      requestBody,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRECT_PROD,
-    );
     try {
       event = stripe.webhooks.constructEvent(
         requestBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRECT_PROD,
       );
-      console.log('============> WEBHOOK event', event);
       const session = event.data.object as Stripe.Checkout.Session;
 
-      console.log('============> WEBHOOK session', session);
-
-      console.log('============> WEBHOOK event', event);
-      ``;
+      console.log('============> WEBHOOK event type', event.type);
 
       if (event.type === 'customer.subscription.updated') {
         // Handle subscription cancellation
@@ -109,7 +99,11 @@ export class SubscriptionService {
         const subscription = event.data.object as any;
 
         if (subscription.canceled_at !== null) {
-          await this.subscriptionPlanModel.findOneAndUpdate(
+          console.log(
+            '============> WEBHOOK updated with cancelled at not null',
+            subscription.canceled_at,
+          );
+          const sub = await this.subscriptionPlanModel.findOneAndUpdate(
             {
               stripeSubscriptionId: subscription.id,
             },
@@ -122,12 +116,28 @@ export class SubscriptionService {
               // Add any other fields you need to update for cancellation
             },
           );
+          if (sub) {
+            await this.profileModel.findOneAndUpdate(
+              {
+                subscriptionId: sub.id,
+              },
+              {
+                notesAllowed: getNotesBasedOnPlan(SubscriptionPlans.FREE),
+              },
+            );
+          }
         } else {
+          console.log(
+            '============> WEBHOOK updated with cancelled at not null',
+          );
+
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string,
           );
-          console.log('team here', subscription);
-
+          console.log(
+            '============> WEBHOOK updated with cancelled at not null wtih subscription',
+            subscription.id,
+          );
           await this.subscriptionPlanModel.findOneAndUpdate(
             {
               stripeSubscriptionId: subscription.id,
@@ -161,10 +171,6 @@ export class SubscriptionService {
         };
       }
 
-      console.log('============> WEBHOOK  1 session', session);
-
-      console.log('============> WEBHOOK 1 event', event);
-
       if (event.type === 'checkout.session.completed') {
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string,
@@ -175,6 +181,7 @@ export class SubscriptionService {
             userId: session.metadata.userId,
           },
           {
+            status: SubscriptionPlanStatus.ACTIVE,
             stripeCustomerId: session.customer as string,
             stripeSubscriptionId: session.subscription as string,
             stripePriceId: subscription.items.data[0].price.id,
@@ -218,7 +225,7 @@ export class SubscriptionService {
 
         const canceledSubscription = event.data.object as any;
 
-        await this.subscriptionPlanModel.findOneAndUpdate(
+        const sub = await this.subscriptionPlanModel.findOneAndUpdate(
           {
             stripeSubscriptionId: canceledSubscription.id,
           },
@@ -231,6 +238,16 @@ export class SubscriptionService {
             // Add any other fields you need to update for cancellation
           },
         );
+        if (sub) {
+          await this.profileModel.findOneAndUpdate(
+            {
+              subscriptionId: sub.id,
+            },
+            {
+              notesAllowed: getNotesBasedOnPlan(SubscriptionPlans.FREE),
+            },
+          );
+        }
       }
 
       if (event.type === 'customer.subscription.deleted') {
@@ -238,7 +255,7 @@ export class SubscriptionService {
 
         const canceledSubscription = event.data.object as any;
 
-        await this.subscriptionPlanModel.findOneAndUpdate(
+        const sub = await this.subscriptionPlanModel.findOneAndUpdate(
           {
             stripeSubscriptionId: canceledSubscription.id,
           },
@@ -249,14 +266,16 @@ export class SubscriptionService {
           },
         );
 
-        await this.profileModel.findOneAndUpdate(
-          {
-            userId: session.metadata.userId,
-          },
-          {
-            notesAllowed: getNotesBasedOnPlan(SubscriptionPlans.FREE),
-          },
-        );
+        if (sub) {
+          await this.profileModel.findOneAndUpdate(
+            {
+              subscriptionId: sub.id,
+            },
+            {
+              notesAllowed: getNotesBasedOnPlan(SubscriptionPlans.FREE),
+            },
+          );
+        }
       }
 
       return {

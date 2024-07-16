@@ -8,8 +8,8 @@ import {
 import { PatientGender } from './update.dto';
 
 export enum NoteType {
-  SYSTEM_BASED_ASSESSMENT_AND_PLAN = 'System Based Assessment And Plan',
-  CLINICAL_DISCUSSION = 'Clinical Discussion',
+  SYSTEM_BASED_ASSESSMENT_AND_PLAN = 'SOAP Note',
+  CLINICAL_DISCUSSION = 'Concise',
 }
 
 export class NoteDetailUpsertDto {
