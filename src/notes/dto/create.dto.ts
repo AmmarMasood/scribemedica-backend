@@ -10,6 +10,10 @@ export class CreateDto {
 
   @IsString()
   @IsNotEmpty()
+  patientGender: string;
+
+  @IsString()
+  @IsNotEmpty()
   type: string;
 
   @IsBoolean()

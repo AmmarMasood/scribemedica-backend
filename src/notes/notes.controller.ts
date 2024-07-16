@@ -102,4 +102,9 @@ export class NotesController {
   async cleanupNotes(@Req() req: Request) {
     return await this.notesService.hardDeleteOldNotes();
   }
+
+  // @Get('/read/notes')
+  // async readNotes(@Req() req: Request) {
+  //   return await this.notesService.readPromptFromGooglDoc();
+  // }
 }

@@ -23,6 +23,7 @@ const profile_schema_1 = require("../auth/schemas/profile.schema");
 const subscription_plan_schema_1 = require("../subscription/schemas/subscription-plan.schema");
 const plans_1 = require("../subscription/config/plans");
 const openai_2 = require("@azure/openai");
+const googleapis_1 = require("googleapis");
 let NotesService = class NotesService {
     constructor(noteModel, noteDetailModel, profileModel, subscriptionPlanModel) {
         this.noteModel = noteModel;
@@ -35,6 +36,10 @@ let NotesService = class NotesService {
         });
         const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
         const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
+        this.googleDocAuth = new googleapis_1.google.auth.GoogleAuth({
+            keyFile: '/Users/ammarmasood/Desktop/projects/quasar/scribemedica-nest/src/notes/google.json',
+            scopes: 'https://www.googleapis.com/auth/documents',
+        });
         this.azureOpenAi = new openai_2.OpenAIClient(azureOpenAiEndpoint, new openai_2.AzureKeyCredential(azureOpenAiApiKey));
     }
     async createNew(createDto, user) {
@@ -74,6 +79,7 @@ let NotesService = class NotesService {
                 patientName,
                 type,
                 finalized,
+                patientGender: createDto.patientGender,
                 userId: user.userId,
             });
             return newNote;
@@ -114,10 +120,16 @@ let NotesService = class NotesService {
     }
     async finalize(user, noteDetailUpsertDto, noteId) {
         try {
+            const note = await this.noteModel.findOne({
+                _id: noteId,
+                userId: user.userId,
+            });
+            if (!note)
+                throw new Error('Unable to find note');
             const generated = await this.generateDetails(user, {
                 transcript: noteDetailUpsertDto.transcript,
                 noteType: noteDetailUpsertDto.noteType,
-                patientGender: noteDetailUpsertDto.patientGender,
+                patientGender: noteDetailUpsertDto.patientGender || note.patientGender,
             });
             const finalizedNote = await this.noteModel.findOneAndUpdate({
                 _id: noteId,
@@ -156,16 +168,56 @@ let NotesService = class NotesService {
             throw new Error('Unable to finalize note');
         }
     }
+    async extractPrompts(text) {
+        const firstPromptMatch = text.match(/\*\*start-first-prompt\*\*([\s\S]*?)\*\*end-first-prompt\*\*/);
+        const firstPrompt = firstPromptMatch ? firstPromptMatch[1] : '';
+        const secondPromptMatch = text.match(/\*\*start-second-prompt\*\*([\s\S]*?)\*\*end-second-prompt\*\*/);
+        const secondPrompt = secondPromptMatch ? secondPromptMatch[1] : '';
+        const specialityPromptMatch = text.match(/\*\*if-speciality-start\*\*([\s\S]*?)\*\*if-specialty-end\*\*/);
+        const specialityPrompt = specialityPromptMatch
+            ? specialityPromptMatch[1]
+            : '';
+        return {
+            firstPrompt: firstPrompt,
+            secondPrompt: secondPrompt,
+            specialityPrompt: specialityPrompt,
+        };
+    }
+    async readPromptFromGooglDoc() {
+        var _a, _b;
+        try {
+            const auth = await this.googleDocAuth.getClient();
+            const docs = googleapis_1.google.docs({ version: 'v1', auth });
+            const res = await docs.documents.get({
+                documentId: '1ziMCFT-IcAN_WnBN_QLHeu7P8AjqvNmgppwe3hzBjfQ',
+            });
+            const content = (_b = (_a = res.data.body) === null || _a === void 0 ? void 0 : _a.content) === null || _b === void 0 ? void 0 : _b.map((c) => { var _a, _b; return (_b = (_a = c.paragraph) === null || _a === void 0 ? void 0 : _a.elements[0]['textRun']) === null || _b === void 0 ? void 0 : _b.content; });
+            return this.extractPrompts(content[1]);
+        }
+        catch (e) {
+            console.log('read from doc error', e);
+        }
+    }
+    replaceVariableInPrompt(prompt, variables) {
+        return prompt.replace(/\{([^}]+)\}/g, (_, varName) => variables[varName.trim()] || `{${varName}}`);
+    }
     async generateDetails(user, noteDetailGenerateDto) {
         try {
             const profile = await this.profileModel.findOne({
                 userId: user.userId,
             });
-            const text = `Create a medical note based on with this transcript for the person here is the transcript ${noteDetailGenerateDto.transcript}`;
+            const { firstPrompt, secondPrompt, specialityPrompt } = await this.readPromptFromGooglDoc();
+            const text = this.replaceVariableInPrompt(firstPrompt, {
+                patientGender: noteDetailGenerateDto.patientGender,
+                transcript: noteDetailGenerateDto.transcript,
+            });
+            console.log('text', text);
             if (profile.speciality) {
-                text.concat(` and the speciality of the doctor who wrote this transcript is ${profile.speciality}, so make sure to create a note based on that speciality`);
+                text.concat(this.replaceVariableInPrompt(specialityPrompt, {
+                    speciality: profile.speciality,
+                }));
             }
-            const t = await this.generateDetailWithAzure(text, noteDetailGenerateDto.transcript, noteDetailGenerateDto.noteType);
+            const t = await this.generateDetailWithAzure(text, secondPrompt, noteDetailGenerateDto.transcript, noteDetailGenerateDto.noteType);
             return t;
         }
         catch (err) {
@@ -204,7 +256,7 @@ let NotesService = class NotesService {
             throw new Error('Unable to generate note details');
         }
     }
-    async generateDetailWithAzure(text, transcript, noteType) {
+    async generateDetailWithAzure(text, promptText, transcript, noteType) {
         try {
             const c2 = await this.azureOpenAi.getChatCompletions('scribemedica-gpt-35', [
                 {
@@ -216,7 +268,11 @@ let NotesService = class NotesService {
             const c3 = await this.azureOpenAi.getChatCompletions('scribemedica-gpt-35', [
                 {
                     role: 'user',
-                    content: `This is the medical note: ${reply} created against patient with this transcript ${transcript} for the patient. Enhance it and return a ${noteType}.`,
+                    content: this.replaceVariableInPrompt(promptText, {
+                        reply: reply,
+                        transcript: transcript,
+                        noteType: noteType,
+                    }),
                 },
             ], {});
             return {

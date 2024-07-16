@@ -70,6 +70,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Profile.prototype, "notesCreated", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Profile.prototype, "heardAboutUs", void 0);
 Profile = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,

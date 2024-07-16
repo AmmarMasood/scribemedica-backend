@@ -36,6 +36,7 @@ export declare class Profile {
     subscriptionId: ObjectId;
     notesAllowed: number;
     notesCreated: number;
+    heardAboutUs: string;
 }
 export declare const ProfileSchema: import("mongoose").Schema<Profile, import("mongoose").Model<Profile, any, any, any, import("mongoose").Document<unknown, any, Profile> & Profile & {
     _id: import("mongoose").Types.ObjectId;

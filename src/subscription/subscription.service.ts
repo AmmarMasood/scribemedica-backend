@@ -50,6 +50,20 @@ export class SubscriptionService {
         stripePriceId: process.env.STRIPE_TIER_2_MONTHLY_ID,
         price: 60,
       },
+      {
+        id: 'unlimited-yearly',
+        name: 'Unlimited Yearly',
+        description: 'Unlimited notes',
+        stripePriceId: process.env.STRIPE_UNLIMITED_YEARLY_PRICE_ID,
+        price: 99,
+      },
+      {
+        id: 'unlimited-monthly',
+        name: 'Unlimited Monthly',
+        description: 'Unlimited notes',
+        stripePriceId: process.env.STRIPE_UNLIMITED_MONTHLY_PRICE_ID,
+        price: 9,
+      },
     ];
   }
 

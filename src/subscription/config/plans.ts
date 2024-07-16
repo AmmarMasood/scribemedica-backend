@@ -11,6 +11,8 @@ export enum SubscriptionPlans {
   TIER1_MONTHLY = 'tier1-monthly',
   TIER2_YEARLY = 'tier2-yearly',
   TIER2_MONTHLY = 'tier2-monthly',
+  UNLIMITED_YEARLY = 'unlimited-yearly',
+  UNLIMITED_MONTHLY = 'unlimited-monthly',
   FREE = 'free',
 }
 
@@ -21,6 +23,7 @@ export enum SubscriptionPlanStatus {
 }
 
 export const getNotesBasedOnPlan = (plan: SubscriptionPlans) => {
+  console.log('plan to check', plan);
   switch (plan) {
     case SubscriptionPlans.TIER1_YEARLY:
     case SubscriptionPlans.TIER1_MONTHLY:
@@ -30,6 +33,9 @@ export const getNotesBasedOnPlan = (plan: SubscriptionPlans) => {
       return 100;
     case SubscriptionPlans.FREE:
       return 10;
+    case SubscriptionPlans.UNLIMITED_YEARLY:
+    case SubscriptionPlans.UNLIMITED_MONTHLY:
+      return Math.pow(10, 6);
     default:
       return 0;
   }

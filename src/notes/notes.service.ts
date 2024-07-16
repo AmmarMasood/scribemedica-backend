@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateDto } from './dto/create.dto';
-import { IUser } from 'src/auth/interface/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Note } from './schemas/note.schema';
 import { Model } from 'mongoose';
@@ -21,11 +16,13 @@ import {
   isFreePlanActive,
 } from 'src/subscription/config/plans';
 import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
+import { google } from 'googleapis';
 
 @Injectable()
 export class NotesService {
   private openai: any;
   private azureOpenAi: any;
+  private googleDocAuth: any;
   constructor(
     @InjectModel(Note.name) private noteModel: Model<Note>,
     @InjectModel(NoteDetail.name) private noteDetailModel: Model<NoteDetail>,
@@ -39,6 +36,11 @@ export class NotesService {
     });
     const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
     const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
+    this.googleDocAuth = new google.auth.GoogleAuth({
+      keyFile:
+        '/Users/ammarmasood/Desktop/projects/quasar/scribemedica-nest/src/notes/google.json',
+      scopes: 'https://www.googleapis.com/auth/documents',
+    });
 
     this.azureOpenAi = new OpenAIClient(
       azureOpenAiEndpoint,
@@ -85,6 +87,7 @@ export class NotesService {
         patientName,
         type,
         finalized,
+        patientGender: createDto.patientGender,
         userId: user.userId,
       });
       return newNote;
@@ -142,10 +145,15 @@ export class NotesService {
     noteId: string,
   ) {
     try {
+      const note = await this.noteModel.findOne({
+        _id: noteId,
+        userId: user.userId,
+      });
+      if (!note) throw new Error('Unable to find note');
       const generated = await this.generateDetails(user, {
         transcript: noteDetailUpsertDto.transcript,
         noteType: noteDetailUpsertDto.noteType,
-        patientGender: noteDetailUpsertDto.patientGender,
+        patientGender: noteDetailUpsertDto.patientGender || note.patientGender,
       });
       const finalizedNote = await this.noteModel.findOneAndUpdate(
         {
@@ -198,6 +206,58 @@ export class NotesService {
     }
   }
 
+  private async extractPrompts(text) {
+    // Extract first prompt
+    const firstPromptMatch = text.match(
+      /\*\*start-first-prompt\*\*([\s\S]*?)\*\*end-first-prompt\*\*/,
+    );
+    const firstPrompt = firstPromptMatch ? firstPromptMatch[1] : '';
+
+    // Extract second prompt
+    const secondPromptMatch = text.match(
+      /\*\*start-second-prompt\*\*([\s\S]*?)\*\*end-second-prompt\*\*/,
+    );
+    const secondPrompt = secondPromptMatch ? secondPromptMatch[1] : '';
+
+    //Extract specialitt prompt
+    const specialityPromptMatch = text.match(
+      /\*\*if-speciality-start\*\*([\s\S]*?)\*\*if-specialty-end\*\*/,
+    );
+    const specialityPrompt = specialityPromptMatch
+      ? specialityPromptMatch[1]
+      : '';
+
+    return {
+      firstPrompt: firstPrompt,
+      secondPrompt: secondPrompt,
+      specialityPrompt: specialityPrompt,
+    };
+  }
+
+  async readPromptFromGooglDoc() {
+    try {
+      const auth = await this.googleDocAuth.getClient();
+      const docs = google.docs({ version: 'v1', auth });
+      const res = await docs.documents.get({
+        documentId: '1ziMCFT-IcAN_WnBN_QLHeu7P8AjqvNmgppwe3hzBjfQ',
+      });
+      const content = res.data.body?.content?.map(
+        (c) => c.paragraph?.elements[0]['textRun']?.content,
+      );
+      // return content;
+      return this.extractPrompts(content[1]);
+    } catch (e) {
+      console.log('read from doc error', e);
+    }
+  }
+
+  private replaceVariableInPrompt(prompt, variables) {
+    return prompt.replace(
+      /\{([^}]+)\}/g,
+      (_, varName) => variables[varName.trim()] || `{${varName}}`,
+    );
+  }
+
   async generateDetails(
     user: any,
     noteDetailGenerateDto: NoteDetailGenerateDto,
@@ -207,11 +267,20 @@ export class NotesService {
         userId: user.userId,
       });
 
-      const text = `Create a medical note based on with this transcript for the person here is the transcript ${noteDetailGenerateDto.transcript}`;
+      const { firstPrompt, secondPrompt, specialityPrompt } =
+        await this.readPromptFromGooglDoc();
+      const text = this.replaceVariableInPrompt(firstPrompt, {
+        patientGender: noteDetailGenerateDto.patientGender,
+        transcript: noteDetailGenerateDto.transcript,
+      });
+
+      console.log('text', text);
 
       if (profile.speciality) {
         text.concat(
-          ` and the speciality of the doctor who wrote this transcript is ${profile.speciality}, so make sure to create a note based on that speciality`,
+          this.replaceVariableInPrompt(specialityPrompt, {
+            speciality: profile.speciality,
+          }),
         );
       }
 
@@ -223,6 +292,7 @@ export class NotesService {
 
       const t = await this.generateDetailWithAzure(
         text,
+        secondPrompt,
         noteDetailGenerateDto.transcript,
         noteDetailGenerateDto.noteType,
       );
@@ -266,7 +336,12 @@ export class NotesService {
       throw new Error('Unable to generate note details');
     }
   }
-  async generateDetailWithAzure(text: any, transcript: any, noteType: any) {
+  async generateDetailWithAzure(
+    text: any,
+    promptText: string,
+    transcript: any,
+    noteType: any,
+  ) {
     try {
       const c2 = await this.azureOpenAi.getChatCompletions(
         'scribemedica-gpt-35',
@@ -284,7 +359,11 @@ export class NotesService {
         [
           {
             role: 'user',
-            content: `This is the medical note: ${reply} created against patient with this transcript ${transcript} for the patient. Enhance it and return a ${noteType}.`,
+            content: this.replaceVariableInPrompt(promptText, {
+              reply: reply,
+              transcript: transcript,
+              noteType: noteType,
+            }),
           },
         ],
         {},

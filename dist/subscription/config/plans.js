@@ -7,6 +7,8 @@ var SubscriptionPlans;
     SubscriptionPlans["TIER1_MONTHLY"] = "tier1-monthly";
     SubscriptionPlans["TIER2_YEARLY"] = "tier2-yearly";
     SubscriptionPlans["TIER2_MONTHLY"] = "tier2-monthly";
+    SubscriptionPlans["UNLIMITED_YEARLY"] = "unlimited-yearly";
+    SubscriptionPlans["UNLIMITED_MONTHLY"] = "unlimited-monthly";
     SubscriptionPlans["FREE"] = "free";
 })(SubscriptionPlans = exports.SubscriptionPlans || (exports.SubscriptionPlans = {}));
 var SubscriptionPlanStatus;
@@ -16,6 +18,7 @@ var SubscriptionPlanStatus;
     SubscriptionPlanStatus["CANCELLED"] = "CANCELLED";
 })(SubscriptionPlanStatus = exports.SubscriptionPlanStatus || (exports.SubscriptionPlanStatus = {}));
 const getNotesBasedOnPlan = (plan) => {
+    console.log('plan to check', plan);
     switch (plan) {
         case SubscriptionPlans.TIER1_YEARLY:
         case SubscriptionPlans.TIER1_MONTHLY:
@@ -25,6 +28,9 @@ const getNotesBasedOnPlan = (plan) => {
             return 100;
         case SubscriptionPlans.FREE:
             return 10;
+        case SubscriptionPlans.UNLIMITED_YEARLY:
+        case SubscriptionPlans.UNLIMITED_MONTHLY:
+            return Math.pow(10, 6);
         default:
             return 0;
     }

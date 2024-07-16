@@ -49,6 +49,9 @@ export class Profile {
 
   @Prop()
   notesCreated: number;
+
+  @Prop()
+  heardAboutUs: string;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile);

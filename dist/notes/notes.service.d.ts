@@ -38,6 +38,7 @@ export declare class NotesService {
     private subscriptionPlanModel;
     private openai;
     private azureOpenAi;
+    private googleDocAuth;
     constructor(noteModel: Model<Note>, noteDetailModel: Model<NoteDetail>, profileModel: Model<Profile>, subscriptionPlanModel: Model<SubscriptionPlan>);
     createNew(createDto: CreateDto, user: any): Promise<import("mongoose").Document<unknown, {}, Note> & Note & {
         _id: import("mongoose").Types.ObjectId;
@@ -58,6 +59,13 @@ export declare class NotesService {
             _id: import("mongoose").Types.ObjectId;
         };
     }>;
+    private extractPrompts;
+    readPromptFromGooglDoc(): Promise<{
+        firstPrompt: any;
+        secondPrompt: any;
+        specialityPrompt: any;
+    }>;
+    private replaceVariableInPrompt;
     generateDetails(user: any, noteDetailGenerateDto: NoteDetailGenerateDto): Promise<{
         note: any;
         model: any;
@@ -66,7 +74,7 @@ export declare class NotesService {
         note: any;
         model: any;
     }>;
-    generateDetailWithAzure(text: any, transcript: any, noteType: any): Promise<{
+    generateDetailWithAzure(text: any, promptText: string, transcript: any, noteType: any): Promise<{
         note: any;
         model: any;
     }>;

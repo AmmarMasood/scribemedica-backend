@@ -4,4 +4,5 @@ export declare class ProfileUpdateDto {
     phoneNumber: string;
     speciality: string;
     fullName: string;
+    heardAboutUs: string;
 }

@@ -20,4 +20,8 @@ export class ProfileUpdateDto {
   @IsString()
   @IsNotEmpty()
   fullName: string;
+
+  @IsString()
+  @IsOptional()
+  heardAboutUs: string;
 }
