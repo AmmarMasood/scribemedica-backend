@@ -37,8 +37,7 @@ export class NotesService {
     const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
     const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
     this.googleDocAuth = new google.auth.GoogleAuth({
-      keyFile:
-        '/Users/ammarmasood/Desktop/projects/quasar/scribemedica-nest/src/notes/google.json',
+      keyFile: './src/notes/google.json',
       scopes: 'https://www.googleapis.com/auth/documents',
     });
 
@@ -269,15 +268,24 @@ export class NotesService {
 
       const { firstPrompt, secondPrompt, specialityPrompt } =
         await this.readPromptFromGooglDoc();
-      const text = this.replaceVariableInPrompt(firstPrompt, {
-        patientGender: noteDetailGenerateDto.patientGender,
-        transcript: noteDetailGenerateDto.transcript,
-      });
+      const firstPromptWithReplacedVariables = this.replaceVariableInPrompt(
+        firstPrompt,
+        {
+          patientGender: noteDetailGenerateDto.patientGender,
+          transcript: noteDetailGenerateDto.transcript,
+        },
+      );
 
-      console.log('text', text);
+      const secondPromptWithReplacedVariables = this.replaceVariableInPrompt(
+        firstPrompt,
+        {
+          patientGender: noteDetailGenerateDto.patientGender,
+          transcript: noteDetailGenerateDto.transcript,
+        },
+      );
 
       if (profile.speciality) {
-        text.concat(
+        firstPromptWithReplacedVariables.concat(
           this.replaceVariableInPrompt(specialityPrompt, {
             speciality: profile.speciality,
           }),
@@ -291,8 +299,8 @@ export class NotesService {
       // );
 
       const t = await this.generateDetailWithAzure(
-        text,
-        secondPrompt,
+        firstPromptWithReplacedVariables,
+        secondPromptWithReplacedVariables,
         noteDetailGenerateDto.transcript,
         noteDetailGenerateDto.noteType,
       );
@@ -337,33 +345,36 @@ export class NotesService {
     }
   }
   async generateDetailWithAzure(
-    text: any,
-    promptText: string,
+    firstPromptWithReplacedVariables: any,
+    secondPromptWithReplacedVariables: string,
     transcript: any,
     noteType: any,
   ) {
     try {
       const c2 = await this.azureOpenAi.getChatCompletions(
-        'scribemedica-gpt-35',
+        'scribemedica2',
         [
           {
             role: 'user',
-            content: text,
+            content: firstPromptWithReplacedVariables,
           },
         ],
         {},
       );
       const reply = c2.choices[0].message.content;
       const c3 = await this.azureOpenAi.getChatCompletions(
-        'scribemedica-gpt-35',
+        'scribemedica2',
         [
           {
             role: 'user',
-            content: this.replaceVariableInPrompt(promptText, {
-              reply: reply,
-              transcript: transcript,
-              noteType: noteType,
-            }),
+            content: this.replaceVariableInPrompt(
+              secondPromptWithReplacedVariables,
+              {
+                reply: reply,
+                transcript: transcript,
+                noteType: noteType,
+              },
+            ),
           },
         ],
         {},
