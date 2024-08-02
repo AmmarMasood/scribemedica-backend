@@ -9,6 +9,10 @@ var SubscriptionPlans;
     SubscriptionPlans["TIER2_MONTHLY"] = "tier2-monthly";
     SubscriptionPlans["UNLIMITED_YEARLY"] = "unlimited-yearly";
     SubscriptionPlans["UNLIMITED_MONTHLY"] = "unlimited-monthly";
+    SubscriptionPlans["UNLIMITED_PROFESSIONAL_YEARLY"] = "unlimited-professional-yearly";
+    SubscriptionPlans["UNLIMITED_PROFESSIONAL_MONTHLY"] = "unlimited-professional-monthly";
+    SubscriptionPlans["UNLIMITED_EXPERT_YEARLY"] = "unlimited-expert-yearly";
+    SubscriptionPlans["UNLIMITED_EXPERT_MONTHLY"] = "unlimited-expert-monthly";
     SubscriptionPlans["FREE"] = "free";
 })(SubscriptionPlans = exports.SubscriptionPlans || (exports.SubscriptionPlans = {}));
 var SubscriptionPlanStatus;
@@ -27,9 +31,13 @@ const getNotesBasedOnPlan = (plan) => {
         case SubscriptionPlans.TIER2_MONTHLY:
             return 100;
         case SubscriptionPlans.FREE:
-            return 10;
+            return 12;
         case SubscriptionPlans.UNLIMITED_YEARLY:
         case SubscriptionPlans.UNLIMITED_MONTHLY:
+        case SubscriptionPlans.UNLIMITED_PROFESSIONAL_YEARLY:
+        case SubscriptionPlans.UNLIMITED_PROFESSIONAL_MONTHLY:
+        case SubscriptionPlans.UNLIMITED_EXPERT_YEARLY:
+        case SubscriptionPlans.UNLIMITED_EXPERT_MONTHLY:
             return Math.pow(10, 6);
         default:
             return 0;

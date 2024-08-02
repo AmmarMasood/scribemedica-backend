@@ -13,6 +13,10 @@ export enum SubscriptionPlans {
   TIER2_MONTHLY = 'tier2-monthly',
   UNLIMITED_YEARLY = 'unlimited-yearly',
   UNLIMITED_MONTHLY = 'unlimited-monthly',
+  UNLIMITED_PROFESSIONAL_YEARLY = 'unlimited-professional-yearly',
+  UNLIMITED_PROFESSIONAL_MONTHLY = 'unlimited-professional-monthly',
+  UNLIMITED_EXPERT_YEARLY = 'unlimited-expert-yearly',
+  UNLIMITED_EXPERT_MONTHLY = 'unlimited-expert-monthly',
   FREE = 'free',
 }
 
@@ -32,9 +36,13 @@ export const getNotesBasedOnPlan = (plan: SubscriptionPlans) => {
     case SubscriptionPlans.TIER2_MONTHLY:
       return 100;
     case SubscriptionPlans.FREE:
-      return 10;
+      return 12;
     case SubscriptionPlans.UNLIMITED_YEARLY:
     case SubscriptionPlans.UNLIMITED_MONTHLY:
+    case SubscriptionPlans.UNLIMITED_PROFESSIONAL_YEARLY:
+    case SubscriptionPlans.UNLIMITED_PROFESSIONAL_MONTHLY:
+    case SubscriptionPlans.UNLIMITED_EXPERT_YEARLY:
+    case SubscriptionPlans.UNLIMITED_EXPERT_MONTHLY:
       return Math.pow(10, 6);
     default:
       return 0;

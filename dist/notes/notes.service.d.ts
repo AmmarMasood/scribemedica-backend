@@ -74,7 +74,7 @@ export declare class NotesService {
         note: any;
         model: any;
     }>;
-    generateDetailWithAzure(text: any, promptText: string, transcript: any, noteType: any): Promise<{
+    generateDetailWithAzure(firstPromptWithReplacedVariables: any, secondPromptWithReplacedVariables: string, transcript: any, noteType: any): Promise<{
         note: any;
         model: any;
     }>;

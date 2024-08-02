@@ -86,4 +86,9 @@ export declare class NotesController {
     cleanupNotes(req: Request): Promise<{
         deletedNotes: number;
     }>;
+    readNotes(req: Request): Promise<{
+        firstPrompt: any;
+        secondPrompt: any;
+        specialityPrompt: any;
+    }>;
 }

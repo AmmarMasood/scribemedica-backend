@@ -12,6 +12,10 @@ export declare enum SubscriptionPlans {
     TIER2_MONTHLY = "tier2-monthly",
     UNLIMITED_YEARLY = "unlimited-yearly",
     UNLIMITED_MONTHLY = "unlimited-monthly",
+    UNLIMITED_PROFESSIONAL_YEARLY = "unlimited-professional-yearly",
+    UNLIMITED_PROFESSIONAL_MONTHLY = "unlimited-professional-monthly",
+    UNLIMITED_EXPERT_YEARLY = "unlimited-expert-yearly",
+    UNLIMITED_EXPERT_MONTHLY = "unlimited-expert-monthly",
     FREE = "free"
 }
 export declare enum SubscriptionPlanStatus {

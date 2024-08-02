@@ -50,6 +50,9 @@ let NotesController = class NotesController {
     async cleanupNotes(req) {
         return await this.notesService.hardDeleteOldNotes();
     }
+    async readNotes(req) {
+        return await this.notesService.readPromptFromGooglDoc();
+    }
 };
 __decorate([
     (0, common_1.Get)(),
@@ -128,6 +131,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], NotesController.prototype, "cleanupNotes", null);
+__decorate([
+    (0, common_1.Get)('/read/notes'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], NotesController.prototype, "readNotes", null);
 NotesController = __decorate([
     (0, common_1.Controller)('/private/notes'),
     __metadata("design:paramtypes", [notes_service_1.NotesService])

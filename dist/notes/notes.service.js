@@ -37,7 +37,7 @@ let NotesService = class NotesService {
         const azureOpenAiApiKey = process.env.AZURE_OPENAI_KEY;
         const azureOpenAiEndpoint = process.env.AZURE_ENDPOINT;
         this.googleDocAuth = new googleapis_1.google.auth.GoogleAuth({
-            keyFile: '/Users/ammarmasood/Desktop/projects/quasar/scribemedica-nest/src/notes/google.json',
+            keyFile: './src/notes/google.json',
             scopes: 'https://www.googleapis.com/auth/documents',
         });
         this.azureOpenAi = new openai_2.OpenAIClient(azureOpenAiEndpoint, new openai_2.AzureKeyCredential(azureOpenAiApiKey));
@@ -55,9 +55,6 @@ let NotesService = class NotesService {
                 const notes = await this.noteModel.find({
                     userId: user.userId,
                 });
-                if (!(0, plans_1.isFreePlanActive)(subscription)) {
-                    throw new Error('Your free plan has expired.');
-                }
                 if (profile.notesAllowed <= notes.length) {
                     throw new Error('You have reached your free plan notes limit');
                 }
@@ -207,17 +204,20 @@ let NotesService = class NotesService {
                 userId: user.userId,
             });
             const { firstPrompt, secondPrompt, specialityPrompt } = await this.readPromptFromGooglDoc();
-            const text = this.replaceVariableInPrompt(firstPrompt, {
+            const firstPromptWithReplacedVariables = this.replaceVariableInPrompt(firstPrompt, {
                 patientGender: noteDetailGenerateDto.patientGender,
                 transcript: noteDetailGenerateDto.transcript,
             });
-            console.log('text', text);
+            const secondPromptWithReplacedVariables = this.replaceVariableInPrompt(firstPrompt, {
+                patientGender: noteDetailGenerateDto.patientGender,
+                transcript: noteDetailGenerateDto.transcript,
+            });
             if (profile.speciality) {
-                text.concat(this.replaceVariableInPrompt(specialityPrompt, {
+                firstPromptWithReplacedVariables.concat(this.replaceVariableInPrompt(specialityPrompt, {
                     speciality: profile.speciality,
                 }));
             }
-            const t = await this.generateDetailWithAzure(text, secondPrompt, noteDetailGenerateDto.transcript, noteDetailGenerateDto.noteType);
+            const t = await this.generateDetailWithAzure(firstPromptWithReplacedVariables, secondPromptWithReplacedVariables, noteDetailGenerateDto.transcript, noteDetailGenerateDto.noteType);
             return t;
         }
         catch (err) {
@@ -256,19 +256,19 @@ let NotesService = class NotesService {
             throw new Error('Unable to generate note details');
         }
     }
-    async generateDetailWithAzure(text, promptText, transcript, noteType) {
+    async generateDetailWithAzure(firstPromptWithReplacedVariables, secondPromptWithReplacedVariables, transcript, noteType) {
         try {
-            const c2 = await this.azureOpenAi.getChatCompletions('scribemedica-gpt-35', [
+            const c2 = await this.azureOpenAi.getChatCompletions('scribemedica2', [
                 {
                     role: 'user',
-                    content: text,
+                    content: firstPromptWithReplacedVariables,
                 },
             ], {});
             const reply = c2.choices[0].message.content;
-            const c3 = await this.azureOpenAi.getChatCompletions('scribemedica-gpt-35', [
+            const c3 = await this.azureOpenAi.getChatCompletions('scribemedica2', [
                 {
                     role: 'user',
-                    content: this.replaceVariableInPrompt(promptText, {
+                    content: this.replaceVariableInPrompt(secondPromptWithReplacedVariables, {
                         reply: reply,
                         transcript: transcript,
                         noteType: noteType,

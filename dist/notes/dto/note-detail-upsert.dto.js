@@ -14,8 +14,8 @@ const class_validator_1 = require("class-validator");
 const update_dto_1 = require("./update.dto");
 var NoteType;
 (function (NoteType) {
-    NoteType["SYSTEM_BASED_ASSESSMENT_AND_PLAN"] = "System Based Assessment And Plan";
-    NoteType["CLINICAL_DISCUSSION"] = "Clinical Discussion";
+    NoteType["SYSTEM_BASED_ASSESSMENT_AND_PLAN"] = "Standard Length";
+    NoteType["CLINICAL_DISCUSSION"] = "Concise";
 })(NoteType = exports.NoteType || (exports.NoteType = {}));
 class NoteDetailUpsertDto {
 }

@@ -27,46 +27,32 @@ let SubscriptionService = class SubscriptionService {
         this.stripeService = stripeService;
         this.storeSubscriptionPlans = [
             {
-                id: 'tier1-yearly',
-                name: 'Tier 1 Yearly',
-                description: '375 notes/month',
-                stripePriceId: process.env.STRIPE_TIER_1_YEARLY_PRICE_ID,
-                price: 1200,
-            },
-            {
-                id: 'tier1-monthly',
-                name: 'Tier 1 Monthly',
-                description: '375 notes/month',
-                stripePriceId: process.env.STRIPE_TIER_1_MONTHLY_ID,
-                price: 120,
-            },
-            {
-                id: 'tier2-yearly',
-                name: 'Tier 2 Yearly',
-                description: '100 notes/month',
-                stripePriceId: process.env.STRIPE_TIER_2_YEARLY_PRICE_ID,
-                price: 600,
-            },
-            {
-                id: 'tier2-monthly',
-                name: 'Tier 2 Monthly',
-                description: '100 notes/month',
-                stripePriceId: process.env.STRIPE_TIER_2_MONTHLY_ID,
-                price: 60,
-            },
-            {
-                id: 'unlimited-yearly',
-                name: 'Unlimited Yearly',
+                id: 'unlimited-professional-yearly',
+                name: 'Unlimited Professional Yearly',
                 description: 'Unlimited notes',
-                stripePriceId: process.env.STRIPE_UNLIMITED_YEARLY_PRICE_ID,
+                stripePriceId: process.env.STRIPE_UNLIMITED_PROFESSIONAL_YEARLY_PRICE_ID,
+                price: 1068,
+            },
+            {
+                id: 'unlimited-professional-monthly',
+                name: 'Unlimited Professional Monthly',
+                description: 'Unlimited notes',
+                stripePriceId: process.env.STRIPE_UNLIMITED_PROFESSIONAL_MONTHLY_PRICE_ID,
                 price: 99,
             },
             {
-                id: 'unlimited-monthly',
-                name: 'Unlimited Monthly',
+                id: 'unlimited-expert-yearly',
+                name: 'Unlimited Expert Yearly',
                 description: 'Unlimited notes',
-                stripePriceId: process.env.STRIPE_UNLIMITED_MONTHLY_PRICE_ID,
-                price: 9,
+                stripePriceId: process.env.STRIPE_UNLIMITED_EXPERT_YEARLY_PRICE_ID,
+                price: 5388,
+            },
+            {
+                id: 'unlimited-expert-monthly',
+                name: 'Unlimited Expert Monthly',
+                description: 'Unlimited notes',
+                stripePriceId: process.env.STRIPE_UNLIMITED_EXPERT_MONTHLY_PRICE_ID,
+                price: 499,
             },
         ];
     }
@@ -85,28 +71,33 @@ let SubscriptionService = class SubscriptionService {
         var _a;
         let event;
         const stripe = this.stripeService.getStripe();
-        console.log('============> WEBHOOK start', requestBody, signature, process.env.STRIPE_WEBHOOK_SECRECT_PROD);
         try {
             event = stripe.webhooks.constructEvent(requestBody, signature, process.env.STRIPE_WEBHOOK_SECRECT_PROD);
-            console.log('============> WEBHOOK event', event);
             const session = event.data.object;
-            console.log('============> WEBHOOK session', session);
-            console.log('============> WEBHOOK event', event);
-            ``;
+            console.log('============> WEBHOOK event type', event.type);
             if (event.type === 'customer.subscription.updated') {
                 const subscription = event.data.object;
                 if (subscription.canceled_at !== null) {
-                    await this.subscriptionPlanModel.findOneAndUpdate({
+                    console.log('============> WEBHOOK updated with cancelled at not null', subscription.canceled_at);
+                    const sub = await this.subscriptionPlanModel.findOneAndUpdate({
                         stripeSubscriptionId: subscription.id,
                     }, {
                         status: plans_1.SubscriptionPlanStatus.CANCELLED,
                         planId: plans_1.SubscriptionPlans.FREE,
                         freePlanExpirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                     });
+                    if (sub) {
+                        await this.profileModel.findOneAndUpdate({
+                            subscriptionId: sub.id,
+                        }, {
+                            notesAllowed: (0, plans_1.getNotesBasedOnPlan)(plans_1.SubscriptionPlans.FREE),
+                        });
+                    }
                 }
                 else {
+                    console.log('============> WEBHOOK updated with cancelled at not null');
                     const subscription = await stripe.subscriptions.retrieve(session.subscription);
-                    console.log('team here', subscription);
+                    console.log('============> WEBHOOK updated with cancelled at not null wtih subscription', subscription.id);
                     await this.subscriptionPlanModel.findOneAndUpdate({
                         stripeSubscriptionId: subscription.id,
                     }, {
@@ -129,13 +120,12 @@ let SubscriptionService = class SubscriptionService {
                     status: 200,
                 };
             }
-            console.log('============> WEBHOOK  1 session', session);
-            console.log('============> WEBHOOK 1 event', event);
             if (event.type === 'checkout.session.completed') {
                 const subscription = await stripe.subscriptions.retrieve(session.subscription);
                 await this.subscriptionPlanModel.findOneAndUpdate({
                     userId: session.metadata.userId,
                 }, {
+                    status: plans_1.SubscriptionPlanStatus.ACTIVE,
                     stripeCustomerId: session.customer,
                     stripeSubscriptionId: session.subscription,
                     stripePriceId: subscription.items.data[0].price.id,
@@ -159,27 +149,36 @@ let SubscriptionService = class SubscriptionService {
             }
             if (event.type === 'subscription_schedule.canceled') {
                 const canceledSubscription = event.data.object;
-                await this.subscriptionPlanModel.findOneAndUpdate({
+                const sub = await this.subscriptionPlanModel.findOneAndUpdate({
                     stripeSubscriptionId: canceledSubscription.id,
                 }, {
                     status: plans_1.SubscriptionPlanStatus.CANCELLED,
                     planId: plans_1.SubscriptionPlans.FREE,
                     freePlanExpirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                 });
+                if (sub) {
+                    await this.profileModel.findOneAndUpdate({
+                        subscriptionId: sub.id,
+                    }, {
+                        notesAllowed: (0, plans_1.getNotesBasedOnPlan)(plans_1.SubscriptionPlans.FREE),
+                    });
+                }
             }
             if (event.type === 'customer.subscription.deleted') {
                 const canceledSubscription = event.data.object;
-                await this.subscriptionPlanModel.findOneAndUpdate({
+                const sub = await this.subscriptionPlanModel.findOneAndUpdate({
                     stripeSubscriptionId: canceledSubscription.id,
                 }, {
                     status: plans_1.SubscriptionPlanStatus.CANCELLED,
                     planId: plans_1.SubscriptionPlans.FREE,
                 });
-                await this.profileModel.findOneAndUpdate({
-                    userId: session.metadata.userId,
-                }, {
-                    notesAllowed: (0, plans_1.getNotesBasedOnPlan)(plans_1.SubscriptionPlans.FREE),
-                });
+                if (sub) {
+                    await this.profileModel.findOneAndUpdate({
+                        subscriptionId: sub.id,
+                    }, {
+                        notesAllowed: (0, plans_1.getNotesBasedOnPlan)(plans_1.SubscriptionPlans.FREE),
+                    });
+                }
             }
             return {
                 status: 'success',
