@@ -170,6 +170,7 @@ export class NotesService {
         noteId: finalizedNote._id,
         modelUsed: generated.model,
         noteType: noteDetailUpsertDto.noteType,
+        patientInstructions: generated.patientInstructions,
       });
 
       return {
@@ -379,10 +380,27 @@ export class NotesService {
         ],
         {},
       );
+      const patientInstructions = await this.azureOpenAi.getChatCompletions(
+        'scribemedica2',
+        [
+          {
+            role: 'user',
+            content: `This is the medical note generated for user ${c3.choices[0].message.content}, Generate a brief letter as a summary of the key instructions and recommendations for the patient to take home at the end of the visit. Start with the date and then Dear patient...`,
+          },
+        ],
+      );
 
       return {
-        note: c3.choices[0].message.content,
+        note: c3.choices[0].message.content?.replace(
+          /[\{\[][^\{\}\[\]]*[\}\]]/g,
+          '',
+        ),
         model: c3.model,
+        patientInstructions:
+          patientInstructions.choices[0].message.content?.replace(
+            /[\{\[][^\{\}\[\]]*[\}\]]/g,
+            '',
+          ),
       };
     } catch (err) {
       console.log(err);

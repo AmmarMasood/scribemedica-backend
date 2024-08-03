@@ -24,6 +24,9 @@ export class NoteDetail {
   modelUsed: string;
 
   @Prop()
+  patientInstructions: string;
+
+  @Prop()
   deleted: boolean;
 }
 
